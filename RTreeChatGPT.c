@@ -170,7 +170,7 @@ void search(HRTreeNode *node, Rect rect, void (*callback)(void *)) {
         if (node->is_leaf) {
             for (i = 0; i < node->num_entries; i++) {
                 if (intersects(node->entries[i]->rect, rect)) {
-                    callback(node->entries[i]->data);
+                    print_intersecting_rectangles(node->entries[i]->data);
                 }
             }
         } else {
@@ -182,6 +182,13 @@ void search(HRTreeNode *node, Rect rect, void (*callback)(void *)) {
         }
     }
 }
+
+void print_intersecting_rectangles(void *data) {
+    HRTreeData *d = (HRTreeData *)data;
+    printf("Intersecting rectangle: (%d, %d) - (%d, %d)\n", 
+           d->rect.xmin, d->rect.ymin, d->rect.xmax, d->rect.ymax);
+}
+
 
 // Helper function to calculate the Hilbert value of a point
 int hilbert_value(int x, int y) {
