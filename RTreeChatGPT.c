@@ -164,3 +164,21 @@ void insert_entry(HRTreeNode **root, void *entry) {
 }
 
 // Search for all entries in the tree that overlap the given rectangle
+void search(HRTreeNode *node, Rect rect, void (*callback)(void *)) {
+    int i;
+    if (intersects(node->rect, rect)) {
+        if (node->is_leaf) {
+            for (i = 0; i < node->num_entries; i++) {
+                if (intersects(node->entries[i]->rect, rect)) {
+                    callback(node->entries[i]->data);
+                }
+            }
+        } else {
+            for (i = 0; i < node->num_entries; i++) {
+                if (intersects(node->children[i]->rect, rect)) {
+                    search(node->children[i], rect, callback);
+                }
+            }
+        }
+    }
+}
