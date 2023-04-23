@@ -225,3 +225,18 @@ int intersects(Rect r1, Rect r2) {
     return !(r2.xmin > r1.xmax || r2.xmax < r1.xmin || r2.ymin > r1.ymax || r2.ymax < r1.ymin);
 }
 
+void preorder_traversal(HRTreeNode *node, void (*callback)(void *)) {
+    if (node != NULL) {
+        print_hilbert_value(node->data);
+        if (!node->is_leaf) {
+            for (int i = 0; i < node->num_entries; i++) {
+                preorder_traversal(node->children[i], callback);
+            }
+        }
+    }
+}
+
+void print_hilbert_value(void *data) {
+    HRTreeData *d = (HRTreeData *)data;
+    printf("Hilbert value: %d\n", d->hilbert_value);
+}
