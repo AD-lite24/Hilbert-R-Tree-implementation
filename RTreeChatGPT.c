@@ -105,3 +105,62 @@ void add_child(HRTreeNode *node, HRTreeNode *child) {
     node->rect = mbr(node->rect, child->rect);
     node->num_entries++;
 }
+// Split a node into two new nodes using the quadratic split algorithm
+void split_node(HRTreeNode *node, HRTreeNode **new_node1, HRTreeNode **new_node2) {
+    int i, j, seed1, seed2;
+    choose_seeds(node, &seed1, &seed2);
+    *new_node1 = malloc(sizeof(HRTreeNode));
+    *new_node2 = malloc(sizeof(HRTreeNode));
+    (*new_node1)->is_leaf = node->is_leaf;
+    (*new_node2)->is_leaf = node->is_leaf;
+    add_entry(*new_node1, node->entries[seed1]);
+    add_entry(*new_node2, node->entries[seed2]);
+    for (i = 0; i < node->num_entries; i++) {
+        if (i != seed1 && i != seed2) {
+            HRTreeNode *target_node = area((*new_node1)->rect) < area((*new_node2)->rect) ? *new_node1 : *new_node2;
+            double enlargement1 = area(mbr(target_node->rect, node->entries[i]->point, DIMENSIONS)) - area(target_node->rect);
+            double enlargement2 = area(mbr((*new_node1)->rect, (*new_node2)->rect)) - area((*new_node1)->rect) - area((*new_node2)->rect);
+            j = enlargement1 < enlargement2 ? 0 : 1;
+            add_entry(target_node->children[j], node->entries[i]);
+            add_child(target_node, target_node->children[j]);
+        }
+    }
+}
+
+// Insert an entry into the Hilbert R-tree
+void insert_entry(HRTreeNode **root, void *entry) {
+    if (*root == NULL) {
+        *root = malloc(sizeof(HRTreeNode));
+        (*root)->is_leaf = 1;
+        add_entry(*root, entry);
+        return;
+    }
+    if ((*root)->is_leaf && (*root)->num_entries == MAX_ENTRIES) {
+        HRTreeNode *new_node1, *new_node2;
+        split_node(*root, &new_node1, &new_node2);
+        *root = malloc(sizeof(HRTreeNode));
+        (*root)->is_leaf = 0;
+        add_child(*root, new_node1);
+        add_child(*root, new_node2);
+    }
+    if (!(*root)->is_leaf) {
+        int i, best_child_index = -1;
+        double best_enlargement = -1;
+        for (i = 0; i < (*root)->num_entries; i++) {
+            double enlargement = area(mbr((*root)->children[i]->rect, ((Point *)entry)->point, DIMENSIONS)) - area((*root)->children[i]->rect);
+            if (enlargement < best_enlargement || best_child_index == -1) {
+                best_child_index = i;
+                best_enlargement = enlargement;
+            } else if (enlargement == best_enlargement && area((*root)->children[i]->rect) < area((*root)->children[best_child_index]->rect)) {
+                best_child_index = i;
+            }
+        }
+        insert_entry(&((*root)->children[best_child_index]), entry);
+        (*root)->rect = mbr((*root)->rect, (*root)->children[best_child_index]->rect);
+    }
+    if ((*root)->is_leaf && (*root)->num_entries < MAX_ENTRIES) {
+        add_entry(*root, entry);
+    }
+}
+
+// Search for all entries in the tree that overlap the given rectangle
