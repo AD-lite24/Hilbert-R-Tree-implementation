@@ -182,3 +182,46 @@ void search(HRTreeNode *node, Rect rect, void (*callback)(void *)) {
         }
     }
 }
+
+// Helper function to calculate the Hilbert value of a point
+int hilbert_value(int x, int y) {
+    int hilbert_order = 32; // Set Hilbert curve order to 32
+    int hilbert_size = (1 << hilbert_order);
+    int hilbert_index = 0;
+    for (int s = hilbert_size / 2; s > 0; s /= 2) {
+        int rx = (x & s) > 0;
+        int ry = (y & s) > 0;
+        hilbert_index += s * s * ((3 * rx) ^ ry);
+        rotate(s, &x, &y, rx, ry);
+    }
+    return hilbert_index;
+}
+
+// Helper function to perform rotation of coordinates
+void rotate(int n, int *x, int *y, int rx, int ry) {
+    if (ry == 0) {
+        if (rx == 1) {
+            *x = n - 1 - *x;
+            *y = n - 1 - *y;
+        }
+        int temp = *x;
+        *x = *y;
+        *y = temp;
+    }
+}
+
+// Helper function to calculate the minimum bounding rectangle of two rectangles
+Rect mbr(Rect r1, Rect r2) {
+    Rect r = {0};
+    r.xmin = (r1.xmin < r2.xmin) ? r1.xmin : r2.xmin;
+    r.ymin = (r1.ymin < r2.ymin) ? r1.ymin : r2.ymin;
+    r.xmax = (r1.xmax > r2.xmax) ? r1.xmax : r2.xmax;
+    r.ymax = (r1.ymax > r2.ymax) ? r1.ymax : r2.ymax;
+    return r;
+}
+
+// Helper function to check whether two rectangles intersect
+int intersects(Rect r1, Rect r2) {
+    return !(r2.xmin > r1.xmax || r2.xmax < r1.xmin || r2.ymin > r1.ymax || r2.ymax < r1.ymin);
+}
+
