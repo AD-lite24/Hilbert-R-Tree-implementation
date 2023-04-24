@@ -108,7 +108,19 @@ NODE createNewNode(bool isLeaf)
     else
         newNode->isLeaf = false;
 
-    return newNode;
+    return newNode; 
+}
+
+//Returns true when rect2 is contained in rect
+bool rect_contains(RECTANGLE rect, RECTANGLE rect2)
+{
+
+    if (rect2->low.x < rect->low.x || rect2->high.x > rect->high.x)
+        return false;
+    if (rect2->low.y < rect->low.y || rect2->high.y > rect->high.y)
+        return false;
+
+    return true;
     
 }
 
