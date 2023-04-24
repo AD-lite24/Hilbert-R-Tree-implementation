@@ -188,7 +188,7 @@ void search(RECTANGLE rect1, NODE root){
         }
     }
     else{
-        print("No rectangle found");
+        printf("No rectangle found");
         return;
     }
     
