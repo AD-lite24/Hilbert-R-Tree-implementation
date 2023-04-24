@@ -48,6 +48,60 @@ struct node
     };
 };
 
+void splitNode(NODE* n, NODE* nn) {
+    // Split n into nodes n and nn
+    // Assign the values to new node
+    nn->isLeaf = n->isLeaf;
+    nn->num_entries = n->num_entries / 2;
+    nn->lhv = n->lhv;
+    // Move entries to nn
+    for (int i = nn->num_entries - 1; i >= 0; i--) {
+        nn->rects[i] = n->rects[i + nn->num_entries];
+        nn->children[i] = n->children[i + nn->num_entries];
+        nn->elements[i] = n->elements[i + nn->num_entries];
+    }
+    // Update the number of entries
+    n->num_entries = n->num_entries - nn->num_entries;
+}
+
+void adjustTree(NODE* n, NODE* nn, rtree* tree) {
+    if (n == &tree->root) {
+        // Create a new root if it is required
+        NODE* new_root = malloc(sizeof(NODE));
+        new_root->isLeaf = false;
+        new_root->num_entries = 1;
+        new_root->lhv = -1;
+        new_root->children[0] = n;
+        new_root->children[1] = nn;
+        // Update the root node of the tree
+        tree->root = *new_root;
+        tree->height++;
+    } else {
+        // Add nn to the parent of n
+        NODE* p = n->parent;
+        int i = 0;
+        while (p->children[i] != n) i++;
+        for (int j = p->num_entries - 1; j >= i + 1; j--) {
+            p->children[j + 1] = p->children[j];
+            p->rects[j + 1] = p->rects[j];
+            p->elements[j + 1] = p->elements[j];
+        }
+        p->children[i + 1] = nn;
+        p->rects[i + 1] = nn->rects[0];
+        p->elements[i + 1] = nn->elements[0];
+        p->num_entries++;
+        // If the parent of n becomes overflow, split it recursively
+        if (p->num_entries == C_n) {
+            NODE* new_node = malloc(sizeof(NODE));
+            new_node->parent = p->parent;
+            splitNode(p, new_node);
+            adjustTree(p, new_node, tree);
+        }
+    }
+}
+
+
+
 // int HRtree_size(struct HRtree *tree) {
 //     return tree->size;
 // }
