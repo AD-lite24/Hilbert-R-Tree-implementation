@@ -100,70 +100,66 @@ void adjustTree(NODE* n, NODE* nn, rtree* tree) {
     }
 }
 
-
-
-void insertRect(rectangle R, NODE* n, rtree* tree) {
-    if (n->isLeaf) {
-        // If n is a leaf node, insert R into it
-        if (n->num_entries < C_l) {
-            int i = n->num_entries - 1;
-            while (i >= 0 && n->rects[i].hilbertValue > R.hilbertValue) {
-                n->rects[i + 1] = n->rects[i];
-                n->elements[i + 1] = n->elements[i];
-                i--;
-            }
-            n->rects[i + 1] = R;
-            n->elements[i + 1] = R.low;
-            n->num_entries++;
-            // Update the LHV of the node and its ancestors
-            NODE* p = n;
-            while (p != NULL) {
-                int max_lhv = -1;
-                for (int i = 0; i < p->num_entries; i++) {
-                    if (p->children[i]->lhv > max_lhv) {
-                        max_lhv = p->children[i]->lhv;
-                    }
-                }
-                p->lhv = max_lhv;
-                p = p->parent;
-            }
-        } else {
-            // If n is a full leaf node, split it and adjust the tree
-            NODE* nn = malloc(sizeof(NODE));
-            nn->parent = n->parent;
-            nn->isLeaf = true;
-            splitNode(n, nn);
-            adjustTree(n, nn, tree);
-            // Insert R into the appropriate leaf node
-            if (R.hilbertValue <= nn->rects[0].hilbertValue) {
-                insertRect(R, n, tree);
-            } else {
-                insertRect(R, nn, tree);
-            }
-        }
-    } else {
-        // If n is not a leaf node, insert R into the appropriate child node
+NODE* chooseLeaf(rectangle R, int h, NODE* n) {
+    while (!n->isLeaf) {
         int i = 0;
-        int min_increase = INT_MAX;
+        int min_lhv = INT_MAX;
         NODE* c = NULL;
         while (i < n->num_entries) {
             rectangle Rn = n->rects[i];
-            int increase = calculateIncrease(Rn, R);
-            if (increase < min_increase) {
-                min_increase = increase;
+            if (Rn.hilbertValue >= h && Rn.hilbertValue < min_lhv) {
+                min_lhv = Rn.hilbertValue;
                 c = n->children[i];
-            } else if (increase == min_increase) {
-                int diff1 = calculateAreaDifference(c->rects[0], R);
-                int diff2 = calculateAreaDifference(n->children[i]->rects[0], R);
-                if (diff1 < diff2) {
-                    c = n->children[i];
-                }
             }
             i++;
         }
-        insertRect(R, c, tree);
+        n = c;
+    }
+    return n;
+}
+
+void insertRect(rectangle R, NODE* n, rtree* tree) {
+    int h = R.hilbertValue;
+    NODE* leaf = chooseLeaf(R, h, n);
+    if (leaf->num_entries < C_l) {
+        // If leaf is not full, insert R into it
+        int i = leaf->num_entries - 1;
+        while (i >= 0 && leaf->rects[i].hilbertValue > R.hilbertValue) {
+            leaf->rects[i + 1] = leaf->rects[i];
+            leaf->elements[i + 1] = leaf->elements[i];
+            i--;
+        }
+        leaf->rects[i + 1] = R;
+        leaf->elements[i + 1] = R.low;
+        leaf->num_entries++;
+        // Update the LHV of the node and its ancestors
+        NODE* p = leaf;
+        while (p != NULL) {
+            int max_lhv = -1;
+            for (int i = 0; i < p->num_entries; i++) {
+                if (p->children[i]->lhv > max_lhv) {
+                    max_lhv = p->children[i]->lhv;
+                }
+            }
+            p->lhv = max_lhv;
+            p = p->parent;
+        }
+    } else {
+        // If leaf is full, split it and adjust the tree
+        NODE* new_leaf = malloc(sizeof(NODE));
+        new_leaf->parent = leaf->parent;
+        new_leaf->isLeaf = true;
+        splitNode(leaf, new_leaf);
+        adjustTree(leaf, new_leaf, tree);
+        // Insert R into the appropriate leaf node
+        if (h <= new_leaf->rects[0].hilbertValue) {
+            insertRect(R, leaf, tree);
+        } else {
+            insertRect(R, new_leaf, tree);
+        }
     }
 }
+
 
 int calculateIncrease(rectangle R1, rectangle R2) {
     // Calculate the minimum bounding rectangle of R1 and R2
