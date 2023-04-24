@@ -14,8 +14,6 @@ typedef struct rtree rtree;
 typedef struct rtree *RTREE;
 typedef struct node node;
 typedef struct node *NODE;
-typedef struct data data;
-typedef struct data *DATA;
 typedef struct rectangle rectangle;
 typedef struct rectangle *RECTANGLE;
 typedef struct element element;
@@ -62,6 +60,7 @@ struct node
         NODE children[M];
         element elements[M];
     };
+    NODE left, right;
 };
 
 void splitNode(NODE n, NODE nn) {
@@ -283,10 +282,6 @@ int main(int argc, char const *argv[])
 //     return entries;
 // }
 
-struct data
-{
-    void * item;
-};
 
 RTREE createNewRTree()
 {
@@ -337,7 +332,6 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
 RECTANGLE createNewRectangle (int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
 NODE insertNode(NODE temp);
-void deleteNode(DATA item);
 bool isOverlap(RECTANGLE rect1, RECTANGLE rect2);
 int AreaOverlap(RECTANGLE rect1, RECTANGLE rect2); // If one rect is completely in another
 void enlargement(NODE parent, NODE child);
