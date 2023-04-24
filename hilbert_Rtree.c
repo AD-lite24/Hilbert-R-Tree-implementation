@@ -168,6 +168,14 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
     return true;
 }
 
+// Returns area of the rectangle
+int rect_area(RECTANGLE rect)
+{
+    int area;
+    area = abs(rect->high.x - rect->low.x)*abs(rect->high.y - rect->low.y);
+    return area;
+}
+
 RECTANGLE createNewRectangle(int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
 NODE insertNode(NODE temp);
