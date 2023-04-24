@@ -170,6 +170,31 @@ void expand_rectangle(RECTANGLE rect, RECTANGLE rect2)
         rect->low.x = rect2->low.x;
 }
 
+
+void search(RECTANGLE rect1, NODE root){
+    NODE temp = root;
+    if(temp!=NULL&&temp->isLeaf==false){
+        for(int i=0; i<M; i++){
+            if(&temp->children[i]!=NULL&&check_intersection_rectangle(&(temp->rects[i]), rect1)){
+                search(rect1, temp->children[i]);
+            }
+        }
+    }
+    else if(temp->isLeaf==true){
+        for(int i=0; i<M; i++){
+            if(&temp->rects[i]!=NULL && check_intersection_rectangle(&temp->rects[i], rect1)){
+                    printf("Rectangle found having the coordinates (%d, %d), (%d, %d)\n", temp->rects[i].high.x, temp->rects[i].high.y, temp->rects[i].low.x, temp->rects[i].low.y);
+            }
+        }
+    }
+    else{
+        print("No rectangle found");
+        return;
+    }
+    
+}
+
+
 RECTANGLE createNewRectangle(int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
 NODE insertNode(NODE temp);
