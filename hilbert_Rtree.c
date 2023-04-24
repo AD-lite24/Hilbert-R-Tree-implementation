@@ -117,7 +117,7 @@ NODE createNewNode(bool isLeaf)
 }
 
 // Returns true when rect2 is contained in rect
-bool rect_contains(RECTANGLE rect, RECTANGLE rect2)
+bool check_container_rectangle(RECTANGLE rect, RECTANGLE rect2)
 {
     if (rect2->low.x < rect->low.x || rect2->high.x > rect->high.x)
         return false;
@@ -128,7 +128,7 @@ bool rect_contains(RECTANGLE rect, RECTANGLE rect2)
 }
 
 // Returns true when rect2 intersects rect
-bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
+bool check_intersection_rectangle(RECTANGLE rect, RECTANGLE rect2)
 {
     if (rect2->low.x > rect->low.x || rect2->high.x < rect->high.x)
         return false;
@@ -139,7 +139,7 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
 }
 
 // Returns true if rectangles are equal
-bool rect_equals(RECTANGLE rect, RECTANGLE rect2)
+bool check_equal_rectangle(RECTANGLE rect, RECTANGLE rect2)
 {
     if (rect->high.x != rect2->high.x || rect->high.y != rect2->high.y)
         return false;
@@ -149,11 +149,25 @@ bool rect_equals(RECTANGLE rect, RECTANGLE rect2)
 }
 
 // Returns area of the rectangle
-int rect_area(RECTANGLE rect)
+int area_of_rectangle(RECTANGLE rect)
 {
     int area;
-    area = abs(rect->high.x - rect->low.x)*abs(rect->high.y - rect->low.y);
+    area = abs(rect->high.x - rect->low.x) * abs(rect->high.y - rect->low.y);
     return area;
+}
+
+// Expand rect to size of rect2
+void expand_rectangle(RECTANGLE rect, RECTANGLE rect2)
+{
+    if (rect2->high.x > rect->high.x)
+        rect->high.x = rect2->high.x;
+    if (rect2->high.y > rect->high.y)
+        rect->high.y = rect2->high.y;
+
+    if (rect2->low.x > rect->low.x)
+        rect->low.x = rect2->low.x;
+    if (rect2->low.x > rect->low.x)
+        rect->low.x = rect2->low.x;
 }
 
 RECTANGLE createNewRectangle(int leftTop, int leftBottom, int rightTop, int rightBottom);
@@ -163,3 +177,8 @@ void deleteNode(DATA item);
 bool isOverlap(RECTANGLE rect1, RECTANGLE rect2);
 int AreaOverlap(RECTANGLE rect1, RECTANGLE rect2); // If one rect is completely in another
 void enlargement(NODE parent, NODE child);
+
+int main()
+{
+    
+}
