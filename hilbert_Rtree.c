@@ -165,6 +165,29 @@ void insertRect(rectangle R, NODE* n, rtree* tree) {
     }
 }
 
+int calculateIncrease(rectangle R1, rectangle R2) {
+    // Calculate the minimum bounding rectangle of R1 and R2
+    int x_min = MIN(R1.low.x, R2.low.x);
+    int y_min = MIN(R1.low.y, R2.low.y);
+    int x_max = MAX(R1.high.x, R2.high.x);
+    int y_max = MAX(R1.high.y, R2.high.y);
+    rectangle MBR = { {x_min, y_min}, {x_max, y_max}, 0 };
+
+    // Calculate the increase in area of R1 if R2 is added to it
+    int area1 = (R1.high.x - R1.low.x) * (R1.high.y - R1.low.y);
+    int area2 = (R2.high.x - R2.low.x) * (R2.high.y - R2.low.y);
+    int mbr_area = (MBR.high.x - MBR.low.x) * (MBR.high.y - MBR.low.y);
+    return mbr_area - area1 - area2;
+}
+
+int calculateAreaDifference(rectangle R1, rectangle R2) {
+    // Calculate the difference in area between R1 and R2
+    int area1 = (R1.high.x - R1.low.x) * (R1.high.y - R1.low.y);
+    int area2 = (R2.high.x - R2.low.x) * (R2.high.y - R2.low.y);
+    rectangle MBR = { {MIN(R1.low.x, R2.low.x), MIN(R1.low.y, R2.low.y)}, {MAX(R1.high.x, R2.high.x), MAX(R1.high.y, R2.high.y)}, 0 };
+    int mbr_area = (MBR.high.x - MBR.low.x) * (MBR.high.y - MBR.low.y);
+    return mbr_area - area1 - area2;
+}
 
 
 // int HRtree_size(struct HRtree *tree) {
