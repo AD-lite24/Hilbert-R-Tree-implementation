@@ -1,8 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include<limits.h>
+#include <string.h>
+
 #define M 4
 #define m 2
 #define DIM 2
+#define C_l 4
+#define C_n 4
 
 typedef struct rtree rtree;
 typedef struct rtree *RTREE;
@@ -33,6 +39,15 @@ struct rectangle
     int hilbertValue;
 };
 
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+
 //Leaf has C_l entries of the form (R, obj_id)
 //Non-leaf has C_n entries of the form (R, ptr, LHV)
 struct node
@@ -41,6 +56,7 @@ struct node
     rectangle rects[M];
     bool isLeaf;
     int lhv; // will be -1 if it is a leaf node
+    NODE parent;
     union
     {
         NODE children[M];
@@ -74,7 +90,7 @@ void adjustTree(NODE n, NODE nn, rtree* tree) {
         new_root->children[0] = n;
         new_root->children[1] = nn;
         // Update the root node of the tree
-        tree->root = *new_root;
+        tree->root = new_root;
         tree->height++;
     } else {
         // Add nn to the parent of n
@@ -163,10 +179,10 @@ void insertRect(rectangle R, NODE n, rtree* tree) {
 
 int calculateIncrease(rectangle R1, rectangle R2) {
     // Calculate the minimum bounding rectangle of R1 and R2
-    int x_min = MIN(R1.low.x, R2.low.x);
-    int y_min = MIN(R1.low.y, R2.low.y);
-    int x_max = MAX(R1.high.x, R2.high.x);
-    int y_max = MAX(R1.high.y, R2.high.y);
+    int x_min = min(R1.low.x, R2.low.x);
+    int y_min = min(R1.low.y, R2.low.y);
+    int x_max = max(R1.high.x, R2.high.x);
+    int y_max = max(R1.high.y, R2.high.y);
     rectangle MBR = { {x_min, y_min}, {x_max, y_max}, 0 };
 
     // Calculate the increase in area of R1 if R2 is added to it
@@ -180,7 +196,7 @@ int calculateAreaDifference(rectangle R1, rectangle R2) {
     // Calculate the difference in area between R1 and R2
     int area1 = (R1.high.x - R1.low.x) * (R1.high.y - R1.low.y);
     int area2 = (R2.high.x - R2.low.x) * (R2.high.y - R2.low.y);
-    rectangle MBR = { {MIN(R1.low.x, R2.low.x), MIN(R1.low.y, R2.low.y)}, {MAX(R1.high.x, R2.high.x), MAX(R1.high.y, R2.high.y)}, 0 };
+    rectangle MBR = { {min(R1.low.x, R2.low.x), min(R1.low.y, R2.low.y)}, {max(R1.high.x, R2.high.x), max(R1.high.y, R2.high.y)}, 0 };
     int mbr_area = (MBR.high.x - MBR.low.x) * (MBR.high.y - MBR.low.y);
     return mbr_area - area1 - area2;
 }
@@ -190,9 +206,9 @@ int calculateAreaDifference(rectangle R1, rectangle R2) {
 //     return tree->size;
 // }
 
-const char *HRtree_string(struct HRtree *tree) {
-    return "(HRtree)";
-}
+// const char *HRtree_string(struct HRtree *tree) {
+//     return "(HRtree)";
+// }
 
 // struct node *newNode(int min, int max) {
 //     struct node *n = (struct node*)malloc(sizeof(struct node));
@@ -278,3 +294,8 @@ void deleteNode(DATA item);
 bool isOverlap(RECTANGLE rect1, RECTANGLE rect2);
 int AreaOverlap(RECTANGLE rect1, RECTANGLE rect2); // If one rect is completely in another
 void enlargement(NODE parent, NODE child);
+int main(int argc, char const *argv[])
+{
+    /* code */
+    return 0;
+}
