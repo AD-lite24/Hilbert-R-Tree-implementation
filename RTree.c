@@ -96,7 +96,7 @@ void adjustTree(NODE n, NODE nn, rtree* tree) {
         // Add nn to the parent of n
         NODE p = n->parent;
         int i = 0;
-        while (p->children[i] != n) i++;
+        while (p!=NULL && p->children[i] != n) i++;
         for (int j = p->num_entries - 1; j >= i + 1; j--) {
             p->children[j + 1] = p->children[j];
             p->rects[j + 1] = p->rects[j];
@@ -153,7 +153,7 @@ void insertRect(rectangle R, NODE n, rtree* tree) {
         while (p != NULL) {
             int max_lhv = -1;
             for (int i = 0; i < p->num_entries; i++) {
-                if (p->children[i]->lhv > max_lhv) {
+                if (p!=leaf && p->children[i]->lhv > max_lhv) {
                     max_lhv = p->children[i]->lhv;
                 }
             }
@@ -216,14 +216,17 @@ int main(int argc, char const *argv[])
     rectangle r1 = {{2, 2}, {4, 4}, 0};
     insertRect(r1, tree.root, &tree);
 
-    // rectangle r2 = {{5, 6}, {7, 8}, 1};
-    // insertRect(r2, tree.root, &tree);
+    rectangle r2 = {{5, 6}, {7, 8}, 1};
+    insertRect(r2, tree.root, &tree);
 
-    // rectangle r3 = {{1, 3}, {2, 4}, 2};
-    // insertRect(r3, tree.root, &tree);
+    rectangle r3 = {{1, 3}, {2, 4}, 2};
+    insertRect(r3, tree.root, &tree);
 
-    // rectangle r4 = {{7, 1}, {8, 2}, 3};
-    // insertRect(r4, tree.root, &tree);
+    rectangle r4 = {{7, 1}, {8, 2}, 3};
+    insertRect(r4, tree.root, &tree);
+
+    // rectangle r5 = {{9, 2}, {4, 6}, 3};
+    // insertRect(r5, tree.root, &tree);
 
     // Print the resulting tree
     printf("Number of nodes: %d\n", tree.cnt);
