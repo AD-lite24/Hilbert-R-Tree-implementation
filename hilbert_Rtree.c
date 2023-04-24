@@ -17,14 +17,8 @@ typedef struct element element;
 struct rtree 
 {
     int cnt; // No.of total Nodes
-    int height; // 
+    int height; //height of the tree
     NODE root;
-};
-
-struct rectangle
-{
-    int low[DIM], high[DIM];
-    int hilbertValue;
 };
 
 struct element
@@ -33,11 +27,18 @@ struct element
     int y;
 };
 
+struct rectangle
+{
+    element low, high;
+    int hilbertValue;
+};
+
+//Leaf has C_l entries of the form (R, obj_id)
+//Non-leaf has C_n entries of the form (R, ptr, LHV)
 struct node
 {
     int num_entries;
-    // void* entries[M];
-    rectangle rect;
+    rectangle rects[M];
     bool isLeaf;
     int lhv; // will be -1 if it is a leaf node
     union
@@ -94,11 +95,22 @@ RTREE createNewRTree()
     newRTree->root = NULL;
 }
 
-// NODE createNewNode(bool isLeaf, )
-// {
-//     NODE newNode = malloc(sizeof(node));
-//     newNode->
-// }
+NODE createNewNode(bool isLeaf)
+{
+    NODE newNode = (NODE)malloc(sizeof(node));
+    memset(newNode, 0, sizeof(node));
+
+    if (isLeaf)
+    {
+        newNode->isLeaf = true;
+        newNode->lhv = -1;
+    }
+    else
+        newNode->isLeaf = false;
+
+    return newNode;
+    
+}
 
 RECTANGLE createNewRectangle (int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
