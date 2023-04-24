@@ -92,36 +92,6 @@ int calculateAreaDifference(rectangle R1, rectangle R2)
     return mbr_area - area1 - area2;
 }
 
-// int HRtree_size(struct HRtree *tree) {
-//     return tree->size;
-// }
-
-// struct node *newNode(int min, int max) {
-//     struct node *n = (struct node*)malloc(sizeof(struct node));
-//     n->min = min;
-//     n->max = max;
-//     n->parent = NULL;
-//     n->left = NULL;
-//     n->right = NULL;
-//     n->leaf = false;
-//     n->entries = newList(max);
-//     mpz_init(n->lhv);
-//     n->bb = NULL;
-//     return n;
-// }
-
-// const char *node_string(struct node *n) {
-//     char *str = (char*)malloc(sizeof(char)*100);
-//     snprintf(str, 100, "node{leaf: %d, entries: %p, lhv: %Zd}", n->leaf, n->entries, n->lhv);
-//     return str;
-// }
-
-// struct entry *node_get_entries(struct node *n, int *n_entries) {
-//     struct entry *entries = NULL;
-//     entries = entryList_get_entries(n->entries, n_entries);
-//     return entries;
-// }
-
 RTREE createNewRTree()
 {
     RTREE newRTree = malloc(sizeof(rtree));
@@ -165,6 +135,16 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
     if (rect2->low.y > rect->low.y || rect2->high.y < rect->high.y)
         return false;
 
+    return true;
+}
+
+// Returns true if rectangles are equal
+bool rect_equals(RECTANGLE rect, RECTANGLE rect2)
+{
+    if (rect->high.x != rect2->high.x || rect->high.y != rect2->high.y)
+        return false;
+    if (rect->low.x != rect2->low.x || rect->low.y != rect2->low.y)
+        return false;
     return true;
 }
 
