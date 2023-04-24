@@ -1,10 +1,4 @@
 #include <stdio.h>
-<<<<<<< HEAD
-#include <stdbool.h>
-#define M 4
-#define m 2
-#define DIM 2
-=======
 #include <stdlib.h>
 #include <stdbool.h>
 #include<limits.h>
@@ -25,92 +19,10 @@ typedef struct data *DATA;
 typedef struct rectangle rectangle;
 typedef struct rectangle *RECTANGLE;
 typedef struct element element;
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 
 struct rtree 
 {
     int cnt; // No.of total Nodes
-<<<<<<< HEAD
-    int height; // 
-    struct node* root;
-};
-
-struct rectangle
-{
-    int low[DIM], high[DIM];
-};
-// node represents a tree node of the tree.
-// C code based on explanation of ChatGPT
-// struct HRtree {
-//     int min, max, bits;
-//     struct node *root;
-//     struct h *hf;
-//     int size;
-// };
-// struct HRtree *new_tree(int min, int max, int bits) {
-//     struct HRtree *rt = malloc(sizeof(struct HRtree));
-//     if (rt == NULL) {
-//         perror("malloc error");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     rt->hf = NULL;
-//     rt->root = NULL;
-
-//     if (bits < DEFAULT_RESOLUTION) {
-//         bits = DEFAULT_RESOLUTION;
-//     }
-
-//     if (min < 0) {
-//         min = DEFAULT_MIN_NODE_ENTRIES;
-//     }
-
-//     if (max < 0) {
-//         max = DEFAULT_MAX_NODE_ENTRIES;
-//     }
-
-//     if (max < min) {
-//         fprintf(stderr, "Minimum number of nodes should be less than Maximum number of nodes and not vice versa.\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     struct h *hf = NULL;
-//     int err = h_new(&hf, (uint32_t) bits, DIM);
-
-//     if (err != 0) {
-//         fprintf(stderr, "Error creating Hilbert curve instance\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     struct node *root = new_node(min, max);
-//     root->leaf = 1;
-
-//     rt->min = min;
-//     rt->max = max;
-//     rt->bits = bits;
-//     rt->hf = hf;
-//     rt->root = root;
-
-//     return rt;
-// }
-// type node struct
-// {
-//     min, max int 
-//     parent *node 
-//     left, right *node 
-//     leaf bool 
-//     entries *entryList 
-//      lhv *big.Int 
-//      bb *rectangle // bounding-box of all children of this entry
-// } 
-// type entry struct {
-    // 	bb   *rectangle // bounding-box of of this entry
-    // 	node *node
-    // 	obj  Rectangle
-    // 	h    *big.Int // hilbert value
-    // 	leaf bool
-// }
-=======
     int height; //height of the tree
     NODE root;
 };
@@ -138,62 +50,11 @@ int max(int a, int b) {
 
 //Leaf has C_l entries of the form (R, obj_id)
 //Non-leaf has C_n entries of the form (R, ptr, LHV)
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 struct node
 {
     int num_entries;
     rectangle rects[M];
     bool isLeaf;
-<<<<<<< HEAD
-    int hilbertValue;
-    struct node* left, right;
-    int lhv; // Something related to Hilbert value
-};
-int HRtree_size(struct HRtree *tree) {
-    return tree->size;
-}
-
-const char *HRtree_string(struct HRtree *tree) {
-    return "(HRtree)";
-}
-
-struct node *newNode(int min, int max) {
-    struct node *n = (struct node*)malloc(sizeof(struct node));
-    n->min = min;
-    n->max = max;
-    n->parent = NULL;
-    n->left = NULL;
-    n->right = NULL;
-    n->leaf = false;
-    n->entries = newList(max);
-    mpz_init(n->lhv);
-    n->bb = NULL;
-    return n;
-}
-
-const char *node_string(struct node *n) {
-    char *str = (char*)malloc(sizeof(char)*100);
-    snprintf(str, 100, "node{leaf: %d, entries: %p, lhv: %Zd}", n->leaf, n->entries, n->lhv);
-    return str;
-}
-
-struct entry *node_get_entries(struct node *n, int *n_entries) {
-    struct entry *entries = NULL;
-    entries = entryList_get_entries(n->entries, n_entries);
-    return entries;
-}
-// struct node
-// {
-//     enum kind kind; // LEAF or BRANCH
-//     int count;      // number of rects
-//     struct rect rects[MAX_ENTRIES];
-//     union
-//     {
-//         struct node *children[MAX_ENTRIES];
-//         struct item items[MAX_ENTRIES];
-//     };
-// };
-=======
     int lhv; // will be -1 if it is a leaf node
     NODE parent;
     union
@@ -220,7 +81,7 @@ void splitNode(NODE n, NODE nn) {
 }
 
 void adjustTree(NODE n, NODE nn, rtree* tree) {
-    if (n == &tree->root) {
+    if (n == &(tree->root)) {
         // Create a new root if it is required
         NODE new_root = malloc(sizeof(node));
         new_root->isLeaf = false;
@@ -276,6 +137,7 @@ NODE chooseLeaf(rectangle R, int h, NODE n) {
 void insertRect(rectangle R, NODE n, rtree* tree) {
     int h = R.hilbertValue;
     NODE leaf = chooseLeaf(R, h, n);
+    // printf("%ld", leaf); 
     if (leaf->num_entries < C_l) {
         // If leaf is not full, insert R into it
         int i = leaf->num_entries - 1;
@@ -292,6 +154,7 @@ void insertRect(rectangle R, NODE n, rtree* tree) {
         while (p != NULL) {
             int max_lhv = -1;
             for (int i = 0; i < p->num_entries; i++) {
+                    printf("hehe\n");
                 if (p->children[i]->lhv > max_lhv) {
                     max_lhv = p->children[i]->lhv;
                 }
@@ -419,24 +282,11 @@ int main(int argc, char const *argv[])
 //     entries = entryList_get_entries(n->entries, n_entries);
 //     return entries;
 // }
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 
 struct data
 {
     void * item;
 };
-<<<<<<< HEAD
-
-typedef struct rtree rtree;
-typedef struct rtree* RTREE;
-typedef struct node node;
-typedef struct node* NODE;
-typedef struct data data;
-typedef struct data* DATA;
-typedef struct rectangle rectangle;
-typedef struct rectangle* RECTANGLE;
-=======
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 
 RTREE createNewRTree()
 {
@@ -446,11 +296,7 @@ RTREE createNewRTree()
     newRTree->root = NULL;
 }
 
-<<<<<<< HEAD
-NODE createNewNode(bool isLeaf, )
-=======
 NODE createNewNode(bool isLeaf)
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 {
     NODE newNode = (NODE)malloc(sizeof(node));
     memset(newNode, 0, sizeof(node));
@@ -466,8 +312,6 @@ NODE createNewNode(bool isLeaf)
     return newNode; 
 }
 
-<<<<<<< HEAD
-=======
 //Returns true when rect2 is contained in rect
 bool rect_contains(RECTANGLE rect, RECTANGLE rect2)
 {
@@ -490,7 +334,6 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
     return true;
 }
 
->>>>>>> 06463a27e279544f76cb21e8a7b8b26ee21c5ff3
 RECTANGLE createNewRectangle (int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
 NODE insertNode(NODE temp);
