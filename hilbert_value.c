@@ -4,7 +4,7 @@
 
 
 // Assumes coordinates are 32-bit signed integers
-#define COORD_BITS 16                 // Number of bits used for each coordinate
+#define COORD_BITS 16                   // Number of bits used for each coordinate
 #define HILBERT_BITS (COORD_BITS * 2) // Total number of bits in Hilbert curve
 
 typedef struct rectangle rectangle;
@@ -83,7 +83,6 @@ int main()
     //Create rectangle with coords (0,0) and (4,4) = 160
     //Create rectangle with coords (0,0) and (2,4) = 136
     //Create rectangle with coords (1,1) and (1,1) = 10
-    RECTANGLE rect = createRectangle(1, 1, 2, 2);
+    RECTANGLE rect = createRectangle(1, 1, 32, 32);
     printf("%d", rect->hilbertValue);
-
 }
