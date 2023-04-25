@@ -402,13 +402,13 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
     return true;
 }
 
-rectangle node_rect_calc(struct node *node) {
-    struct rect rect = node->rects[0];
-    for (int i = 1; i < node->count; i++) {
-        rect_expand(&rect, &node->rects[i]);
-    }
-    return rect;
-}
+// rectangle node_rect_calc(struct node *node) {
+//     struct rect rect = node->rects[0];
+//     for (int i = 1; i < node->count; i++) {
+//         rect_expand(&rect, &node->rects[i]);
+//     }
+//     return rect;
+// }
 
 RECTANGLE createNewRectangle (int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
