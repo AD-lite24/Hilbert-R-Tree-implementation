@@ -402,13 +402,28 @@ bool rect_intersects(RECTANGLE rect, RECTANGLE rect2)
     return true;
 }
 
-// rectangle node_rect_calc(struct node *node) {
-//     struct rect rect = node->rects[0];
-//     for (int i = 1; i < node->count; i++) {
-//         rect_expand(&rect, &node->rects[i]);
-//     }
-//     return rect;
-// }
+void rect_expand(RECTANGLE rect, RECTANGLE rect2)
+{
+
+    if (rect2->low.x < rect->low.x)
+        rect->low.x = rect2->low.x;
+    if (rect2->low.y < rect->low.y)
+        rect->low.y = rect2->low.y;
+    if (rect2->high.x > rect->high.x)
+        rect->high.x = rect2->high.x;
+    if (rect2->high.y > rect->high.y)
+        rect->high.y = rect2->high.y;
+}
+
+// Returns a pointer to the MBR for all the rectangles in a node
+RECTANGLE node_rect_calc(NODE node) {
+    RECTANGLE rect = createNewRectangle(0, 0, 0, 0);
+    for (int i = 0; i < M; i++) {
+        if (node->rects[i])
+            rect_expand(rect, node->rects[i]);
+    }
+    return rect;
+}
 
 RECTANGLE createNewRectangle (int leftTop, int leftBottom, int rightTop, int rightBottom);
 int findArea(NODE temp);
