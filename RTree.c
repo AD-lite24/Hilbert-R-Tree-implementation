@@ -95,8 +95,22 @@ void adjustTree(NODE n, NODE nn, rtree* tree) {
     } else {
         // Add nn to the parent of n
         NODE p = n->parent;
+        if (p == NULL) {
+            // n is the root node, no parent exists
+            // create a new root node
+            NODE new_root = malloc(sizeof(node));
+            new_root->isLeaf = false;
+            new_root->num_entries = 1;
+            new_root->lhv = -1;
+            new_root->children[0] = n;
+            new_root->children[1] = nn;
+            // Update the root node of the tree
+            tree->root = new_root;
+            tree->height++;
+            return;
+        }
         int i = 0;
-        while (p!=NULL && p->children[i] != n) i++;
+        while (p->children[i] != n) i++;
         for (int j = p->num_entries - 1; j >= i + 1; j--) {
             p->children[j + 1] = p->children[j];
             p->rects[j + 1] = p->rects[j];
@@ -115,6 +129,7 @@ void adjustTree(NODE n, NODE nn, rtree* tree) {
         }
     }
 }
+
 
 NODE chooseLeaf(rectangle R, int h, NODE n) {
     while (!n->isLeaf) {
@@ -201,6 +216,39 @@ int calculateAreaDifference(rectangle R1, rectangle R2) {
     return mbr_area - area1 - area2;
 }
 
+
+// void printHilbertTree(NODE root, int depth) {
+//     if (root == NULL) {
+//         return;
+//     }
+
+//     // Print the current node
+//     for (int i = 0; i < depth; i++) {
+//         printf("  ");
+//     }
+//     printf("Node with %d entries:\n", root->num_entries);
+//     for (int i = 0; i < root->num_entries; i++) {
+//         for (int j = 0; j < depth; j++) {
+//             printf("  ");
+//         }
+//         printf("  Entry %d:\n", i);
+//         for (int j = 0; j < depth; j++) {
+//             printf("  ");
+//         }
+//         printf("    Rect: (%d, %d, %d, %d)\n", root->rects[i].low.x, root->rects[i].low.y, root->rects[i].high.x, root->rects[i].high.y);
+//         for (int j = 0; j < depth; j++) {
+//             printf("  ");
+//         }
+//         printf("    Element: %d %d\n", root->elements[i].x,root->elements[i].y);
+//     }
+
+//     // Recursively print the children nodes
+//     for (int i = 0; i < root->num_entries + 1; i++) {
+//         printHilbertTree(root->children[i], depth + 1);
+//     }
+// }
+
+
 int main(int argc, char const *argv[])
 {
     rtree tree;
@@ -225,8 +273,11 @@ int main(int argc, char const *argv[])
     rectangle r4 = {{7, 1}, {8, 2}, 3};
     insertRect(r4, tree.root, &tree);
 
-    // rectangle r5 = {{9, 2}, {4, 6}, 3};
-    // insertRect(r5, tree.root, &tree);
+    rectangle r5 = {{9, 2}, {4, 6}, 3};
+    insertRect(r5, tree.root, &tree);
+
+    // printHilbertTree(tree.root,0);
+
 
     // Print the resulting tree
     printf("Number of nodes: %d\n", tree.cnt);
