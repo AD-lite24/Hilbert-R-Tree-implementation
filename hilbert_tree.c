@@ -206,6 +206,119 @@ NODE createNewNode(bool isLeaf)
 //     }
 // }
 
+NODE handleOverlow(NODE N, RECTANGLE r)
+{
+    NODE parent = N->parent;
+    RECTANGLE rects[17];
+    int k = 0;
+
+    for (int i = 0; i < M; i++)
+    {
+        NODE child = parent->children[i];
+        
+        if (child)
+        {
+            for (int j = 0; j < M; j++)
+            {
+                if(child->rects[j])
+                    rects[k++] = child->rects[j];
+            }
+        }
+    }
+
+    rects[16] = r;  //Adding rect to the set of all sibling rects
+    if (k==15)  //No space in any siblings, hence split
+    {
+        NODE new=createNewNode(false);
+        int x=0;
+        NODE temp=N->parent->children[x];
+        while(temp!=NULL){
+            x++;
+            temp=N->parent->children[x];
+        }
+        temp=new;
+
+    }
+
+    else
+    {
+        
+    }
+
+}
+/*
+In a Hilbert R-tree, the Hilbert value is a measure of the spatial location of a point in the space. To distribute points evenly among all nodes according to their Hilbert value, you can follow the steps outlined below:
+
+Calculate the Hilbert value for each point that you want to insert into the tree. You can use a Hilbert curve algorithm to do this.
+
+Sort the points in ascending order of their Hilbert value.
+
+Calculate the number of nodes in the tree. You can do this by dividing the total number of points by the maximum number of points that can be stored in a node.
+
+Divide the sorted list of points into equal-sized groups, where each group contains (number of points / number of nodes) points.
+
+Traverse the tree, and for each node, choose the group of points that has the Hilbert values closest to the Hilbert value of the node. You can use a binary search algorithm to find the closest group.
+
+Insert the chosen group of points into the node.
+
+By distributing points evenly among all nodes according to their Hilbert value, you can ensure that the tree is balanced and efficient for searching and querying spatial data.
+*/
+
+// void handle_overflow(struct hilbert_node *node) {
+//     int num_entries = node->count;
+//     int split_point = num_entries / 2;
+//     int num_groups = (num_entries % 2 == 0) ? 2 : 3;
+
+//     // Allocate memory for the new nodes
+//     struct hilbert_node **new_nodes = (struct hilbert_node **) malloc(num_groups * sizeof(struct hilbert_node *));
+//     for (int i = 0; i < num_groups; i++) {
+//         new_nodes[i] = (struct hilbert_node *) malloc(sizeof(struct hilbert_node));
+//         new_nodes[i]->is_leaf = node->is_leaf;
+//         new_nodes[i]->count = 0;
+//         new_nodes[i]->capacity = node->capacity;
+//         new_nodes[i]->hilbert_values = (uint32_t *) malloc(node->capacity * sizeof(uint32_t));
+
+//         if (node->is_leaf) {
+//             new_nodes[i]->data = (void **) malloc(node->capacity * sizeof(void *));
+//         } else {
+//             new_nodes[i]->children = (struct hilbert_node **) malloc(node->capacity * sizeof(struct hilbert_node *));
+//         }
+//     }
+
+//     // Copy entries into the new nodes
+//     for (int i = 0; i < num_entries; i++) {
+//         int group = (i < split_point) ? 0 : (i < 2*split_point) ? 1 : 2;
+//         int index = (group == 2) ? i - 2*split_point : (group == 1) ? i - split_point : i;
+//         new_nodes[group]->hilbert_values[index] = node->hilbert_values[i];
+
+//         if (node->is_leaf) {
+//             new_nodes[group]->data[index] = node->data[i];
+//         } else {
+//             new_nodes[group]->children[index] = node->children[i];
+//         }
+
+//         new_nodes[group]->count++;
+//     }
+
+//     // Update the parent node to point to the new nodes
+//     if (node->parent == NULL) {
+//         // Create a new root node if necessary
+//         node->parent = (struct hilbert_node *) malloc(sizeof(struct hilbert_node));
+//         node->parent->is_leaf = 0;
+//         node->parent->count = 1;
+//         node->parent->capacity = node->capacity;
+//         node->parent->hilbert_values = (uint32_t *) malloc(node->capacity * sizeof(uint32_t));
+//         node->parent->children = (struct hilbert_node **) malloc(2 * sizeof(struct hilbert_node *));
+//         node->parent->children[0] = node;
+//         node->parent->children[1] = new_nodes[0];
+//         node->parent->hilbert_values[0] = new_nodes[0]->hilbert_values[0];
+//         new_nodes[0]->parent = node->parent;
+
+//     } else {
+//         // Insert the new nodes into the parent node
+       
+
+
 RECTANGLE findMBR (NODE curr_node)
 {
     RECTANGLE newRec = (RECTANGLE)malloc (sizeof(rectangle));
