@@ -448,6 +448,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             if (rects[i]->hilbertValue > lhv)
                 lhv = rects[i]->hilbertValue;
         }
+        n->rects[3] = NULL;
         n->num_entries = 3;
         n->lhv = lhv;
         lhv = INT_MIN;
@@ -459,6 +460,8 @@ NODE handleOverflow(NODE n, RECTANGLE r)
         }
         nn->num_entries = 2;
         nn->lhv = lhv;
+        nn->rects[2] = NULL;
+        nn->rects[3] = NULL;
         return nn;
     }
 
@@ -747,19 +750,20 @@ NODE chooseLeaf(RECTANGLE r, NODE root)
         return N;
 
     int chosen_entry = N->num_entries - 1;  //assuming all entries are sorted
-    int min_lhv = INT32_MIN;
+    int max_lhv = INT_MAX;
     for (int i = 0; i < N->num_entries; i++)
     {
         if (N->children[i]->lhv > r->hilbertValue)
         {
-            if (N->children[i]->lhv > min_lhv)
+            if (N->children[i]->lhv < max_lhv)
             {
                 chosen_entry = i;
-                min_lhv = N->children[i]->lhv;
+                max_lhv = N->children[i]->lhv;
             }
         }
     }
-    chooseLeaf(r, N->children[chosen_entry]);
+    NODE chosen = chooseLeaf(r, N->children[chosen_entry]);
+    return chosen;
 }
 
 void insertRect(RECTANGLE r, NODE root, RTREE tree)
@@ -789,12 +793,18 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
                 {
                     new_root->children[0] = leaf;
                     new_root->children[1] = new_leaf;
+
+                    leaf->parent = new_root;
+                    new_leaf->parent = new_root;
                 }
 
                 else
                 {
                     new_root->children[0] = new_leaf;
                     new_root->children[1] = leaf;
+
+                    new_leaf->parent = new_root;
+                    leaf->parent = new_root;
                 }
 
                 new_root->lhv = max(new_root->children[0]->lhv, new_root->children[1]->lhv);
@@ -804,7 +814,6 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
                 tree->cnt++;
             }
         }
-            
     }
 
     //Leaf not full: insert directly into leaf
