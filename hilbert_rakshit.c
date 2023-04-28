@@ -440,18 +440,25 @@ NODE handleOverflow(NODE n, RECTANGLE r)
         }
         rects[i + 1] = r;
 
+        int lhv = INT_MIN;
         // put 3 in n and 2 in nn
         for (int i = 0; i < 3; i++)
         {
             n->rects[i] = rects[i];
+            if (rects[i]->hilbertValue > lhv)
+                lhv = rects[i]->hilbertValue;
         }
         n->num_entries = 3;
+        n->lhv = lhv;
+        lhv = INT_MIN;
         for (int i = 3; i < 5; i++)
         {
             nn->rects[i-3] = rects[i];
+            if (rects[i]->hilbertValue > lhv)
+                lhv = rects[i]->hilbertValue;
         }
         nn->num_entries = 2;
-
+        nn->lhv = lhv;
         return nn;
     }
 
@@ -745,7 +752,7 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
             
     }
 
-    //Leaf not full insert directly into leaf
+    //Leaf not full: insert directly into leaf
     else
     {
         leaf->rects[leaf->num_entries] = r;
@@ -757,6 +764,9 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
         }
         leaf->rects[i+1] = r;
         leaf->num_entries++;
+
+        if (r->hilbertValue > leaf->lhv)
+            leaf->lhv = r->hilbertValue;
     }
 }
 
