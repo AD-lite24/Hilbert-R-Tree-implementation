@@ -270,16 +270,19 @@ NODE handleOverflowNonLeaf(NODE parent, NODE nn)
             for (int i = 0; i < 3; i++)
             {
                 parent->children[i] = sorted_nodes[i];
+                parent->children[i]->parent = parent;
                 parent->rects[i] = sorted_rects[i];
             }
             for (int i = 0; i < 3; i++)
             {
                 coop_sibling_non_leaf->children[i] = sorted_nodes[i + 3];
+                coop_sibling_non_leaf->children[i]->parent = coop_sibling_non_leaf;
                 coop_sibling_non_leaf->rects[i] = sorted_rects[i + 3];
             }
             for (int i = 0; i < 3; i++)
             {
                 uncle->children[i] = sorted_nodes[i + 6];
+                uncle->children[i]->parent = uncle;
                 uncle->rects[i] = sorted_rects[i + 6];
             }
             uncle->parent = parent->parent;
@@ -293,16 +296,19 @@ NODE handleOverflowNonLeaf(NODE parent, NODE nn)
             for (int i = 0; i < 3; i++)
             {
                 coop_sibling_non_leaf->children[i] = sorted_nodes[i];
+                coop_sibling_non_leaf->children[i]->parent = coop_sibling_non_leaf;
                 coop_sibling_non_leaf->rects[i] = sorted_rects[i];
             }
             for (int i = 0; i < 3; i++)
             {
                 parent->children[i] = sorted_nodes[i + 3];
+                parent->children[i]->parent = parent;
                 parent->rects[i] = sorted_rects[i + 3];
             }
             for (int i = 0; i < 3; i++)
             {
                 uncle->children[i] = sorted_nodes[i + 6];
+                uncle->children[i]->parent = uncle;
                 uncle->rects[i] = sorted_rects[i + 6];
             }
             uncle->parent = parent->parent;
@@ -322,11 +328,13 @@ NODE handleOverflowNonLeaf(NODE parent, NODE nn)
             for (int i = 0; i < 4; i++)
             {
                 parent->children[i] = sorted_nodes[i];
+                parent->children[i]->parent = parent;
                 parent->rects[i] = sorted_rects[i];
             }
             for (int i = 0; i < sum_ele - 3; i++)
             {
                 coop_sibling_non_leaf->children[i] = sorted_nodes[i + 4];
+                coop_sibling_non_leaf->children[i]->parent = coop_sibling_non_leaf;
                 coop_sibling_non_leaf->rects[i] = sorted_rects[i + 4];
             }
         }
@@ -335,11 +343,13 @@ NODE handleOverflowNonLeaf(NODE parent, NODE nn)
             for (int i = 0; i < 4; i++)
             {
                 coop_sibling_non_leaf->children[i] = sorted_nodes[i];
+                coop_sibling_non_leaf->children[i]->parent = coop_sibling_non_leaf;
                 coop_sibling_non_leaf->rects[i] = sorted_rects[i];
             }
             for (int i = 0; i < sum_ele - 3; i++)
             {
                 parent->children[i] = sorted_nodes[i + 4];
+                parent->children[i]->parent = parent;
                 parent->rects[i] = sorted_rects[i + 4];
             }
         }
