@@ -419,7 +419,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
     // }
 
     // It is root but leaf so split has to occur
-    if (n->parent == NULL) 
+    if (n->parent == NULL)
     {
         NODE nn = createNewNode(true);
 
@@ -430,7 +430,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             rects[i] = n->rects[i];
         }
 
-        //insert r into rects according to h value
+        // insert r into rects according to h value
         rects[4] = r;
         int i = 3;
         while (i >= 0 && rects[i]->hilbertValue > r->hilbertValue)
@@ -454,7 +454,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
         lhv = INT_MIN;
         for (int i = 3; i < 5; i++)
         {
-            nn->rects[i-3] = rects[i];
+            nn->rects[i - 3] = rects[i];
             if (rects[i]->hilbertValue > lhv)
                 lhv = rects[i]->hilbertValue;
         }
@@ -516,7 +516,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 NODE nn = createNewNode(n->isLeaf);
                 int lhv = INT_MIN;
 
-                //Initialize rects of nn to null
+                // Initialize rects of nn to null
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
 
@@ -542,7 +542,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 lhv = INT_MIN;
                 for (int i = 6; i < 9; i++)
                 {
-                    nn->rects[i-6] = rects[i];
+                    nn->rects[i - 6] = rects[i];
                     if (rects[i]->hilbertValue > lhv)
                         lhv = rects[i]->hilbertValue;
                 }
@@ -555,7 +555,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             {
                 NODE nn = createNewNode(n->isLeaf);
 
-                //Initialize rects of nn to null
+                // Initialize rects of nn to null
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
 
@@ -590,21 +590,20 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 nn->num_entries = 3;
                 nn->lhv = lhv;
 
-
                 return nn;
             }
         }
 
         // Rearrange entries
         else
-        {   
+        {
             // Number of elements that go in the first and second node respectively
-            int first_rearrange = (n->num_entries + coop_sibling->num_entries + 1)/ 2;
+            int first_rearrange = (n->num_entries + coop_sibling->num_entries + 1) / 2;
             int second_rearrange = n->num_entries + coop_sibling->num_entries + 1 - first_rearrange;
 
             // ONLY WORKS FOR LEAF NODES
             if (coop_sibling->lhv > n->lhv)
-            {   
+            {
                 int lhv = INT_MIN;
                 for (int i = 0; i < first_rearrange; i++)
                 {
@@ -621,7 +620,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                     coop_sibling->rects[i] = rects[first_rearrange + i];
                     if (rects[first_rearrange + i]->hilbertValue > lhv)
                         lhv = rects[first_rearrange + i]->hilbertValue;
-                } 
+                }
                 coop_sibling->num_entries = second_rearrange;
                 coop_sibling->lhv = lhv;
             }
@@ -720,16 +719,14 @@ NODE hilbert_choose_sibling(NODE nn, RECTANGLE new_rect)
     }
     else
     {
-        if (!left_sibling) 
+        if (!left_sibling)
             return right_sibling;
         return left_sibling;
     }
 }
 
-
 // NODE chooseLeaf(RECTANGLE R, int h, NODE n)
 // {
-
 
 //     if (n->isLeaf) return n;
 //     for (int i = 0 ; i < n->num_entries ; i++)
@@ -752,7 +749,7 @@ NODE chooseLeaf(RECTANGLE r, NODE root)
     if (N->isLeaf)
         return N;
 
-    int chosen_entry = N->num_entries - 1;  //assuming all entries are sorted
+    int chosen_entry = N->num_entries - 1; // assuming all entries are sorted
     int max_lhv = INT_MAX;
     for (int i = 0; i < N->num_entries; i++)
     {
@@ -781,12 +778,12 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
         // No split occured if new_leaf is null
         if (!new_leaf)
             return;
-        
+
         // Split occured
         else
-        {   
+        {
             adjustTree(leaf->parent, new_leaf);
-            
+
             // Root but leaf split
             if (leaf->parent == NULL)
             {
@@ -819,7 +816,7 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
         }
     }
 
-    //Leaf not full: insert directly into leaf
+    // Leaf not full: insert directly into leaf
     else
     {
         leaf->rects[leaf->num_entries] = r;
@@ -829,7 +826,7 @@ void insertRect(RECTANGLE r, NODE root, RTREE tree)
             leaf->rects[i + 1] = leaf->rects[i];
             i--;
         }
-        leaf->rects[i+1] = r;
+        leaf->rects[i + 1] = r;
         leaf->num_entries++;
 
         if (r->hilbertValue > leaf->lhv)
@@ -967,7 +964,7 @@ void adjustTree(NODE parent, NODE nn)
 
             if (parent->parent)
                 adjustTree(parent->parent, pp);
-        
+
             // Initiate root split
             else
             {
@@ -989,7 +986,6 @@ void adjustTree(NODE parent, NODE nn)
         }
 
         // Overflow handled without splittin
-        
     }
     // Else fit NN in the parent
     else
@@ -998,10 +994,10 @@ void adjustTree(NODE parent, NODE nn)
         parent->children[parent->num_entries] = nn;
         while (i >= 0 && parent->children[i]->lhv > nn->lhv)
         {
-            parent->children[i+1] = parent->children[i];
+            parent->children[i + 1] = parent->children[i];
             i--;
         }
-        parent->children[i+1] = nn;
+        parent->children[i + 1] = nn;
         parent->num_entries++;
         nn->parent = parent;
         if (parent->lhv < nn->lhv)
@@ -1299,11 +1295,11 @@ int main(int argc, char const *argv[])
     insertRect(r5, tree.root, &tree);
     RECTANGLE r6 = (createNewRectangle(8, 5, 8, 5));
     insertRect(r6, tree.root, &tree);
-    RECTANGLE r7 = createNewRectangle(4,5,4,5);
+    RECTANGLE r7 = createNewRectangle(4, 5, 4, 5);
     insertRect(r7, tree.root, &tree);
-    RECTANGLE r8 = createNewRectangle(3,4,3,4);
+    RECTANGLE r8 = createNewRectangle(3, 4, 3, 4);
     insertRect(r8, tree.root, &tree);
-    RECTANGLE r9 = createNewRectangle(3,5,3,5);
+    RECTANGLE r9 = createNewRectangle(3, 5, 3, 5);
     insertRect(r9, tree.root, &tree);
     // RECTANGLE r10 = createNewRectangle(2,4,2,4);
     // insertRect(r10, tree.root, &tree);
