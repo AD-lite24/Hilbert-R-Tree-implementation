@@ -500,9 +500,12 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 rects[i + coop_sibling->num_entries] = n->rects[i];
         }
         rects[n->num_entries + coop_sibling->num_entries] = r;
-        int i = n->num_entries + coop_sibling->num_entries;
+        int i = n->num_entries + coop_sibling->num_entries - 1;
         while (i > 0 && r->hilbertValue < rects[i]->hilbertValue)
-            rects[i+1] = rects[i];
+        {
+            rects[i + 1] = rects[i];
+            i--;
+        }
         rects[i] = r;
 
         // If coop sibling is also full then split
@@ -596,8 +599,8 @@ NODE handleOverflow(NODE n, RECTANGLE r)
         else
         {   
             // Number of elements that go in the first and second node respectively
-            int first_rearrange = n->num_entries + coop_sibling->num_entries / 2;
-            int second_rearrange = n->num_entries + coop_sibling->num_entries - first_rearrange;
+            int first_rearrange = (n->num_entries + coop_sibling->num_entries + 1)/ 2;
+            int second_rearrange = n->num_entries + coop_sibling->num_entries + 1 - first_rearrange;
 
             // ONLY WORKS FOR LEAF NODES
             if (coop_sibling->lhv > n->lhv)
@@ -647,7 +650,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 n->lhv = lhv;
             }
 
-
+            return NULL;
         }
     }
 }
