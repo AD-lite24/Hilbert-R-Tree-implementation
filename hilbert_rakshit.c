@@ -994,22 +994,18 @@ void adjustTree(NODE parent, NODE nn)
     // Else fit NN in the parent
     else
     {
-        int hVal = nn->lhv;
-        int i;
-        for (i = parent->num_entries - 1; i >= 0; i--)
+        int i = parent->num_entries - 1;
+        parent->children[parent->num_entries] = nn;
+        while (i >= 0 && parent->children[i]->lhv > nn->lhv)
         {
-            if (parent->children[i]->lhv > hVal)
-            {
-                parent->children[i + 1] = parent->children[i];
-                parent->rects[i + 1] = parent->rects[i];
-            }
+            parent->children[i+1] = parent->children[i];
+            i--;
         }
-        parent->children[i] = nn;
-        parent->rects[i] = findMBR(nn);
+        parent->children[i+1] = nn;
         parent->num_entries++;
-        parent->lhv = 0;
-        for (int j = 0; j < parent->num_entries; j++)
-            parent->lhv = max(parent->lhv, parent->children[j]->lhv);
+        nn->parent = parent;
+        if (parent->lhv < nn->lhv)
+            parent->lhv = nn->lhv;
     }
 }
 
@@ -1266,7 +1262,7 @@ void myPrint(char *hello, NODE hehe)
     for (int i = 0; i < hehe->num_entries; i++)
     {
         printf("   Entry %d:\n", i);
-        printf("     Rect: ((%d, %d), (%d, %d))\n", hehe->rects[i]->low.x, hehe->rects[i]->low.y, hehe->rects[i]->high.x, hehe->rects[i]->high.y);
+        // printf("     Rect: ((%d, %d), (%d, %d))\n", hehe->rects[i]->low.x, hehe->rects[i]->low.y, hehe->rects[i]->high.x, hehe->rects[i]->high.y);
         printf("     LHV: %d\n", hehe->rects[i]->hilbertValue);
         if (hehe->isLeaf)
         {
