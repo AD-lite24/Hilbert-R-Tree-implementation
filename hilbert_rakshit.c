@@ -75,11 +75,13 @@ struct node
 int hilbert_entry_cmp(RECTANGLE r1, RECTANGLE r2);
 NODE handleOverflow(NODE n, RECTANGLE r);
 NODE hilbert_choose_sibling(NODE nn, RECTANGLE new_rect);
-NODE chooseLeaf(RECTANGLE R, int h, NODE n);
+NODE chooseLeaf(RECTANGLE R, NODE n);
 void insertRect(RECTANGLE R, NODE n, rtree *tree);
 void adjustTree(NODE parent, NODE nn);
 NODE handleOverflowNonLeaf(NODE parent, NODE nn);
 NODE hilbert_choose_sibling_non_leaf(NODE par, NODE nn);
+
+rtree tree;
 
 void rot(int n, int *x, int *y, int rx, int ry)
 {
@@ -352,68 +354,105 @@ NODE handleOverflowNonLeaf(NODE parent, NODE nn)
 
 NODE handleOverflow(NODE n, RECTANGLE r)
 {
-    if (n->parent == NULL)
-    { // if n is a root
-        // NODE new_node = createNewNode(n->children[0]->isLeaf);
-        ELEMENT new_element = (ELEMENT)malloc(sizeof(struct element));
-        new_element->x = r->low.x;
-        new_element->y = r->low.y;
-        NODE nn = createNewNode(n->isLeaf);
-        NODE new_parent = createNewNode(false);
-        ELEMENT hilbert_sorted_array[M + 1];
-        RECTANGLE hilbert_sorted_array_rects[M + 1];
-        for (int i = 0; i < M + 1; i++)
+    // if (n->parent == NULL)
+    // { // if n is a root
+    //     // NODE new_node = createNewNode(n->children[0]->isLeaf);
+    //     ELEMENT new_element = (ELEMENT)malloc(sizeof(struct element));
+    //     new_element->x = r->low.x;
+    //     new_element->y = r->low.y;
+    //     NODE nn = createNewNode(n->isLeaf);
+    //     NODE new_parent = createNewNode(false);
+    //     ELEMENT hilbert_sorted_array[M + 1];
+    //     RECTANGLE hilbert_sorted_array_rects[M + 1];
+    //     for (int i = 0; i < M + 1; i++)
+    //     {
+    //         if (i == M)
+    //         {
+    //             hilbert_sorted_array[i] = new_element;
+    //             hilbert_sorted_array_rects[i] = r;
+    //         }
+    //         else
+    //         {
+    //             hilbert_sorted_array[i] = n->elements[i];
+    //             hilbert_sorted_array_rects[i] = n->rects[i];
+    //         }
+    //     }
+    //     int i = M;
+    //     while (i > 0 && hilbert_sorted_array_rects[i - 1]->hilbertValue > r->hilbertValue)
+    //     {
+    //         hilbert_sorted_array[i] = hilbert_sorted_array[i - 1];
+    //         hilbert_sorted_array_rects[i] = hilbert_sorted_array_rects[i - 1];
+    //         i--;
+    //     }
+    //     hilbert_sorted_array[i] = new_element;
+    //     hilbert_sorted_array_rects[i] = r;
+    //     n->num_entries = M / 2 + 1;
+    //     nn->num_entries = M / 2;
+    //     for (int i = 0; i < M / 2 + 1; i++)
+    //     {
+    //         n->elements[i] = hilbert_sorted_array[i];
+    //         n->rects[i] = hilbert_sorted_array_rects[i];
+    //     }
+    //     for (int i = M / 2 + 1; i < M + 1; i++)
+    //     {
+    //         nn->elements[i - M / 2 - 1] = hilbert_sorted_array[i];
+    //         nn->rects[i - M / 2 - 1] = hilbert_sorted_array_rects[i];
+    //     }
+    //     n->lhv = n->rects[M / 2]->hilbertValue;
+
+    //     nn->lhv = nn->rects[0]->hilbertValue;
+    //     n->parent = new_parent;
+    //     nn->parent = new_parent;
+    //     new_parent->num_entries = 2;
+    //     new_parent->children[0] = n;
+    //     new_parent->children[1] = nn;
+    //     new_parent->parent = NULL;
+    //     new_parent->lhv = n->lhv > nn->lhv ? n->lhv : nn->lhv;
+    //     new_parent->rects[0] = findMBR(n);
+    //     new_parent->rects[1] = findMBR(nn);
+    //     new_parent->children[0]->lhv = max(n->rects[0]->hilbertValue, max(n->rects[1]->hilbertValue, n->rects[2]->hilbertValue));
+    //     new_parent->children[1]->lhv = max(nn->rects[0]->hilbertValue, nn->rects[1]->hilbertValue);
+    //     new_parent->isLeaf = false;
+
+    //     // rects array of new_parent has to be initialised with mbr of n and nn
+    //     return new_parent;
+    // }
+
+    // It is root but leaf so split has to occur
+    if (n->parent == NULL) 
+    {
+        NODE nn = createNewNode(true);
+
+        RECTANGLE rects[5];
+
+        for (int i = 0; i < n->num_entries; i++)
         {
-            if (i == M)
-            {
-                hilbert_sorted_array[i] = new_element;
-                hilbert_sorted_array_rects[i] = r;
-            }
-            else
-            {
-                hilbert_sorted_array[i] = n->elements[i];
-                hilbert_sorted_array_rects[i] = n->rects[i];
-            }
+            rects[i] = n->rects[i];
         }
-        int i = M;
-        while (i > 0 && hilbert_sorted_array_rects[i - 1]->hilbertValue > r->hilbertValue)
+
+        //insert r into rects according to h value
+        rects[4] = r;
+        int i = 3;
+        while (i >= 0 && rects[i]->hilbertValue > r->hilbertValue)
         {
-            hilbert_sorted_array[i] = hilbert_sorted_array[i - 1];
-            hilbert_sorted_array_rects[i] = hilbert_sorted_array_rects[i - 1];
+            rects[i + 1] = rects[i];
             i--;
         }
-        hilbert_sorted_array[i] = new_element;
-        hilbert_sorted_array_rects[i] = r;
-        n->num_entries = M / 2 + 1;
-        nn->num_entries = M / 2;
-        for (int i = 0; i < M / 2 + 1; i++)
-        {
-            n->elements[i] = hilbert_sorted_array[i];
-            n->rects[i] = hilbert_sorted_array_rects[i];
-        }
-        for (int i = M / 2 + 1; i < M + 1; i++)
-        {
-            nn->elements[i - M / 2 - 1] = hilbert_sorted_array[i];
-            nn->rects[i - M / 2 - 1] = hilbert_sorted_array_rects[i];
-        }
-        n->lhv = n->rects[M / 2]->hilbertValue;
+        rects[i + 1] = r;
 
-        nn->lhv = nn->rects[0]->hilbertValue;
-        n->parent = new_parent;
-        nn->parent = new_parent;
-        new_parent->num_entries = 2;
-        new_parent->children[0] = n;
-        new_parent->children[1] = nn;
-        new_parent->parent = NULL;
-        new_parent->lhv = n->lhv > nn->lhv ? n->lhv : nn->lhv;
-        new_parent->rects[0] = findMBR(n);
-        new_parent->rects[1] = findMBR(nn);
-        new_parent->children[0]->lhv = max(n->rects[0]->hilbertValue, max(n->rects[1]->hilbertValue, n->rects[2]->hilbertValue));
-        new_parent->children[1]->lhv = max(nn->rects[0]->hilbertValue, nn->rects[1]->hilbertValue);
-        new_parent->isLeaf = false;
+        // put 3 in n and 2 in nn
+        for (int i = 0; i < 3; i++)
+        {
+            n->rects[i] = rects[i];
+        }
+        n->num_entries = 3;
+        for (int i = 3; i < 5; i++)
+        {
+            nn->rects[i-3] = rects[i];
+        }
+        nn->num_entries = 2;
 
-        // rects array of new_parent has to be initialised with mbr of n and nn
-        return new_parent;
+        return nn;
     }
 
     else
@@ -456,52 +495,56 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             rects[i+1] = rects[i];
         rects[i] = r;
 
-        // // qsort(rects, n->num_entries + coop_sibling->num_entries + 1, sizeof(RECTANGLE), hilbert_entry_cmp);
-        // for (int i = 1; i < n->num_entries + coop_sibling->num_entries + 1; i++)
-        // {
-        //     for (int j = i; j < n->num_entries + coop_sibling->num_entries + 1; j++)
-        //     {
-        //         if (rects[j]->hilbertValue > rects[j - 1]->hilbertValue)
-        //         {
-        //             RECTANGLE x = rects[j];
-        //             rects[j] = rects[j - 1];
-        //             rects[j - 1] = x;
-        //         }
-        //     }
-        // }
         // If coop sibling is also full then split
         if (coop_sibling->num_entries == M)
         {
             if (coop_sibling->lhv > n->lhv)
             {
                 NODE nn = createNewNode(n->isLeaf);
+
+                //Initialize rects of nn to null
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
-                for (int i = 0; i < M; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     n->rects[i] = rects[i];
                 }
-                for (int i = M; i < 2 * M; i++)
+                n->num_entries = 3;
+                for (int i = 3; i < 6; i++)
                 {
-                    coop_sibling->rects[i - M] = rects[i];
+                    coop_sibling->rects[i - 3] = rects[i];
                 }
-                nn->rects[0] = rects[2 * M];
+                coop_sibling->num_entries = 3;
+                for (int i = 6; i < 9; i++)
+                {
+                    nn->rects[i-6] = rects[i];
+                }
+                nn->num_entries = 3;
                 return nn;
             }
             else
             {
                 NODE nn = createNewNode(n->isLeaf);
+
+                //Initialize rects of nn to null
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
-                for (int i = 0; i < M; i++)
+
+                for (int i = 0; i < 3; i++)
                 {
                     coop_sibling->rects[i] = rects[i];
                 }
-                for (int i = M; i < 2 * M; i++)
+                coop_sibling->num_entries = 3;
+                for (int i = 3; i < 6; i++)
                 {
-                    n->rects[i - M] = rects[i];
+                    n->rects[i - 3] = rects[i];
                 }
-                nn->rects[0] = rects[2 * M];
+                n->num_entries = 3;
+                for (int i = 6; i < 9; i++)
+                {
+                    nn->rects[i - 6] = rects[i];
+                }
+                nn->num_entries = 3;
                 return nn;
             }
         }
@@ -518,8 +561,12 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 for (int i = 0; i < first_rearrange; i++)
                     n->rects[i] = rects[i];
 
+                n->num_entries = first_rearrange;
+
                 for (int i = 0; i < second_rearrange; i++)
                     coop_sibling->rects[i] = rects[first_rearrange + i];
+                
+                coop_sibling->num_entries = second_rearrange;
             }
 
             else
@@ -527,9 +574,15 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 for (int i = 0; i < first_rearrange; i++)
                     coop_sibling->rects[i] = rects[i];
 
+                coop_sibling->num_entries = first_rearrange;
+
                 for (int i = 0; i < second_rearrange; i++)
                     n->rects[i] = rects[first_rearrange + i];
+
+                coop_sibling->num_entries = second_rearrange;
             }
+
+
         }
     }
 }
@@ -605,213 +658,261 @@ NODE hilbert_choose_sibling(NODE nn, RECTANGLE new_rect)
     }
 }
 
-// void splitNode(NODE n, NODE nn)
+
+// NODE chooseLeaf(RECTANGLE R, int h, NODE n)
 // {
-//     // Split n into nodes n and nn
-//     // Assign the values to new node
-//     nn->isLeaf = n->isLeaf;
-//     nn->num_entries = n->num_entries / 2;
-//     nn->lhv = n->lhv;
-//     // Move entries to nn
-//     for (int i = nn->num_entries - 1; i >= 0; i--)
+
+
+//     if (n->isLeaf) return n;
+//     for (int i = 0 ; i < n->num_entries ; i++)
 //     {
-//         nn->rects[i] = n->rects[i + nn->num_entries];
-//         nn->children[i] = n->children[i + nn->num_entries];
-//         nn->elements[i] = n->elements[i + nn->num_entries];
-//         n->rects[i + nn->num_entries] = NULL;
-//         n->children[i + nn->num_entries] = NULL;
-//         n->elements[i + nn->num_entries] = NULL;
+//         rectangle lowlo = *(n->children[i]->rects[0]);
+//         rectangle higlo = *(n->children[i]->rects[n->children[i]->num_entries-1]);
+//         if (h >= lowlo.hilbertValue && h <= higlo.hilbertValue)
+//             return chooseLeaf(R, h, n->children[i]);
 //     }
-//     n->num_entries = n->num_entries - nn->num_entries;
-//     // Update the number of entries
-//     // n->num_entries = n->num_entries - nn->num_entries;
+//     if (h >= n->rects[n->num_entries-1]->hilbertValue)
+//         return (R, h, n->children[n->num_entries-1]);
+//     if (h <= n->rects[0]->hilbertValue)
+//         return (R, h, n->children[0]);
 // }
 
-NODE chooseLeaf(RECTANGLE R, int h, NODE n)
+NODE chooseLeaf(RECTANGLE r, NODE root)
 {
-    // while (!n->isLeaf)
-    // {
-    //     int i = 0;
-    //     int min_lhv = INT_MAX;
-    //     NODE c = NULL;
-    //     // while (i < n->num_entries)
-    //     // {
-    //     //     rectangle Rn = *(n->rects[i]);
+    NODE N = root;
 
-    //     //     if (Rn.hilbertValue >= h && Rn.hilbertValue < min_lhv)
-    //     //     {
-    //     //         min_lhv = Rn.hilbertValue;
-    //     //         c = n->children[i];
-    //     //         i = 0;
-    //     //     }
-    //     //     i++;
-    //     // }
-        
+    if (N->isLeaf)
+        return N;
 
-    //     if (c == NULL)
-    //     {
-    //         c = n->children[n->num_entries - 1];
-    //     } // break;
-    //     n = c;
-    // }
-    // return n;
-
-    if (n->isLeaf) return n;
-    for (int i = 0 ; i < n->num_entries ; i++)
+    int chosen_entry = N->num_entries - 1;  //assuming all entries are sorted
+    int min_lhv = INT32_MIN;
+    for (int i = 0; i < N->num_entries; i++)
     {
-        rectangle lowlo = *(n->children[i]->rects[0]);
-        rectangle higlo = *(n->children[i]->rects[n->children[i]->num_entries-1]);
-        if (h >= lowlo.hilbertValue && h <= higlo.hilbertValue)
-            return chooseLeaf(R, h, n->children[i]);
+        if (N->children[i]->lhv > r->hilbertValue)
+        {
+            if (N->children[i]->lhv > min_lhv)
+            {
+                chosen_entry = i;
+                min_lhv = N->children[i]->lhv;
+            }
+        }
     }
-    if (h >= n->rects[n->num_entries-1]->hilbertValue)
-        return (R, h, n->children[n->num_entries-1]);
-    if (h <= n->rects[0]->hilbertValue)
-        return (R, h, n->children[0]);
+    chooseLeaf(r, N->children[chosen_entry]);
 }
 
-// NODE choose_leaf(RECTANGLE r, NODE root)
-// {
-//     NODE N = root;
-
-//     if (N->isLeaf)
-//         return N;
-
-//     int chosen_entry ;
-//     for (int i = 0; i < N->num_entries; i++)
-//     {
-//         if (N->children[])
-//     }
-// }
-
-void insertRect(RECTANGLE R, NODE n, rtree *tree)
+void insertRect(RECTANGLE r, NODE root, RTREE tree)
 {
-    int h = R->hilbertValue;
-    NODE leaf = chooseLeaf(R, h, n);
-    NODE parent_of_leaf = leaf->parent;
-    int sum_ele = 0;
-    for (int i = 0; parent_of_leaf != NULL && i < parent_of_leaf->num_entries; i++)
-    {
-        sum_ele += parent_of_leaf->children[i]->num_entries;
-    }
-    if (leaf->num_entries < C_l)
-    {
-        // If leaf is not full, insert R into it
-        int i = leaf->num_entries - 1;
-        while (i >= 0 && leaf->rects[i]->hilbertValue > R->hilbertValue)
-        {
-            leaf->rects[i + 1] = leaf->rects[i];
-            leaf->elements[i + 1] = leaf->elements[i];
-            i--;
-        }
-        // leaf->rects[i + 1] = (RECTANGLE) malloc (sizeof(rectangle));
-        // leaf->elements[i + 1] = (ELEMENT) malloc (sizeof(element));
-        (leaf->rects[i + 1]) = R;
-        (leaf->elements[i + 1]) = &(R->low);
-        // leaf->elements[i + 1] = &R.low;
-        // leaf->rects[i + 1] = &R;
-        leaf->num_entries++;
+    NODE leaf = chooseLeaf(r, root);
 
-        // Update the LHV of the node and its ancestors
-        NODE p = leaf;
-        while (p != NULL)
-        {
-            int max_lhv = -1;
-            for (int i = 0; i < p->num_entries; i++)
-            {
-                if (p != leaf && p->children[i]->lhv > max_lhv)
-                {
-                    max_lhv = p->children[i]->lhv;
-                }
-                else if (p == leaf)
-                {
-                    for (int i = 0; i < p->num_entries; i++)
-                    {
-                        max_lhv = max(max_lhv, p->rects[i]->hilbertValue);
-                    }
-                }
-            }
-            p->lhv = max_lhv;
-            p = p->parent;
-        }
-    }
-    else if (parent_of_leaf != NULL && sum_ele < M * parent_of_leaf->num_entries)
+    // Leaf full
+    if (leaf->num_entries == M)
     {
-        ELEMENT elements_sorted[sum_ele + 1];
-        RECTANGLE rectangles_sorted[sum_ele + 1];
-        elements_sorted[sum_ele] = &(R->low);
-        rectangles_sorted[sum_ele] = R;
-        int k1 = 0, k2 = 0;
-        for (int i = 0; i < parent_of_leaf->num_entries; i++)
-        {
-            for (int j = 0; j < parent_of_leaf->children[i]->num_entries; j++)
+        NODE new_leaf = handleOverflow(leaf, r);
+
+        // No split occured if new_leaf is null
+        if (!new_leaf)
+            return;
+        
+        // Split occured
+        else
+        {   
+            adjustTree(leaf->parent, new_leaf);
+            
+            // Root but leaf split
+            if (leaf->parent == NULL)
             {
-                elements_sorted[k1++] = parent_of_leaf->children[i]->elements[j];
-                rectangles_sorted[k2++] = parent_of_leaf->children[i]->rects[j];
+                NODE new_root = createNewNode(false);
+
+                if (leaf->lhv < new_leaf->lhv)
+                {
+                    new_root->children[0] = leaf;
+                    new_root->children[1] = new_leaf;
+                }
+
+                else
+                {
+                    new_root->children[0] = new_leaf;
+                    new_root->children[1] = leaf;
+                }
+
+                new_root->lhv = max(new_root->children[0]->lhv, new_root->children[1]->lhv);
+                new_root->num_entries = 2;
+                tree->root = new_root;
+                tree->height++;
+                tree->cnt++;
             }
         }
-        int i = sum_ele;
-        while (rectangles_sorted[i - 1]->hilbertValue > R->hilbertValue && i > 0)
-        {
-            elements_sorted[i] = elements_sorted[i - 1];
-            rectangles_sorted[i] = rectangles_sorted[i - 1];
-            i--;
-        }
-        elements_sorted[i] = &(R->low);
-        rectangles_sorted[i] = R;
-        k1 = 0, k2 = 0;
-        for (int i = 0; i < parent_of_leaf->num_entries; i++)
-        {
-            int j = 0;
-            for (; j < M && k1 < sum_ele + 1 && k2 < sum_ele + 1; j++)
-            {
-                parent_of_leaf->children[i]->rects[j] = rectangles_sorted[k1++];
-                parent_of_leaf->children[i]->elements[j] = elements_sorted[k2++];
-            }
-            parent_of_leaf->children[i]->num_entries = j;
-        }
+            
     }
-    else if (parent_of_leaf != NULL && sum_ele == M * parent_of_leaf->num_entries && parent_of_leaf->num_entries < M)
-    {
-        // parent_of_leaf->children[num_entries] = (NODE)malloc(sizeof(struct node));
-        NODE *n = (NODE *)malloc(sizeof(NODE) * parent_of_leaf->num_entries);
-        for (int i = 0; i < parent_of_leaf->num_entries; i++)
-        {
-            n[i] = parent_of_leaf->children[i];
-        }
-        // handleOverflow(parent_of_leaf->children[parent_of_leaf->num_entries-1],R);
-        NODE nn = handleOverflow(leaf, R);
-        if (nn != NULL)
-            adjustTree(nn->parent, nn);
-        // correct this:
-    }
+
+    //Leaf not full insert directly into leaf
     else
     {
-        NODE new_parent = handleOverflow(n, R);
-        tree->root = new_parent;
+        leaf->rects[leaf->num_entries] = r;
+        int i = leaf->num_entries - 1;
+        while (i >= 0 && leaf->rects[i]->hilbertValue > r->hilbertValue)
+        {
+            leaf->rects[i + 1] = leaf->rects[i];
+            i--;
+        }
+        leaf->rects[i+1] = r;
+        leaf->num_entries++;
     }
 }
+
+// void insertRect(RECTANGLE R, NODE n, rtree *tree)
+// {
+//     NODE leaf = chooseLeaf(R, n);
+//     NODE parent_of_leaf = leaf->parent;
+//     int sum_ele = 0;
+//     for (int i = 0; parent_of_leaf != NULL && i < parent_of_leaf->num_entries; i++)
+//     {
+//         sum_ele += parent_of_leaf->children[i]->num_entries;
+//     }
+//     if (leaf->num_entries < C_l)
+//     {
+//         // If leaf is not full, insert R into it
+//         int i = leaf->num_entries - 1;
+//         while (i >= 0 && leaf->rects[i]->hilbertValue > R->hilbertValue)
+//         {
+//             leaf->rects[i + 1] = leaf->rects[i];
+//             leaf->elements[i + 1] = leaf->elements[i];
+//             i--;
+//         }
+//         // leaf->rects[i + 1] = (RECTANGLE) malloc (sizeof(rectangle));
+//         // leaf->elements[i + 1] = (ELEMENT) malloc (sizeof(element));
+//         (leaf->rects[i + 1]) = R;
+//         (leaf->elements[i + 1]) = &(R->low);
+//         // leaf->elements[i + 1] = &R.low;
+//         // leaf->rects[i + 1] = &R;
+//         leaf->num_entries++;
+
+//         // Update the LHV of the node and its ancestors
+//         NODE p = leaf;
+//         while (p != NULL)
+//         {
+//             int max_lhv = -1;
+//             for (int i = 0; i < p->num_entries; i++)
+//             {
+//                 if (p != leaf && p->children[i]->lhv > max_lhv)
+//                 {
+//                     max_lhv = p->children[i]->lhv;
+//                 }
+//                 else if (p == leaf)
+//                 {
+//                     for (int i = 0; i < p->num_entries; i++)
+//                     {
+//                         max_lhv = max(max_lhv, p->rects[i]->hilbertValue);
+//                     }
+//                 }
+//             }
+//             p->lhv = max_lhv;
+//             p = p->parent;
+//         }
+//     }
+//     else if (parent_of_leaf != NULL && sum_ele < M * parent_of_leaf->num_entries)
+//     {
+//         ELEMENT elements_sorted[sum_ele + 1];
+//         RECTANGLE rectangles_sorted[sum_ele + 1];
+//         elements_sorted[sum_ele] = &(R->low);
+//         rectangles_sorted[sum_ele] = R;
+//         int k1 = 0, k2 = 0;
+//         for (int i = 0; i < parent_of_leaf->num_entries; i++)
+//         {
+//             for (int j = 0; j < parent_of_leaf->children[i]->num_entries; j++)
+//             {
+//                 elements_sorted[k1++] = parent_of_leaf->children[i]->elements[j];
+//                 rectangles_sorted[k2++] = parent_of_leaf->children[i]->rects[j];
+//             }
+//         }
+//         int i = sum_ele;
+//         while (rectangles_sorted[i - 1]->hilbertValue > R->hilbertValue && i > 0)
+//         {
+//             elements_sorted[i] = elements_sorted[i - 1];
+//             rectangles_sorted[i] = rectangles_sorted[i - 1];
+//             i--;
+//         }
+//         elements_sorted[i] = &(R->low);
+//         rectangles_sorted[i] = R;
+//         k1 = 0, k2 = 0;
+//         for (int i = 0; i < parent_of_leaf->num_entries; i++)
+//         {
+//             int j = 0;
+//             for (; j < M && k1 < sum_ele + 1 && k2 < sum_ele + 1; j++)
+//             {
+//                 parent_of_leaf->children[i]->rects[j] = rectangles_sorted[k1++];
+//                 parent_of_leaf->children[i]->elements[j] = elements_sorted[k2++];
+//             }
+//             parent_of_leaf->children[i]->num_entries = j;
+//         }
+//     }
+//     else if (parent_of_leaf != NULL && sum_ele == M * parent_of_leaf->num_entries && parent_of_leaf->num_entries < M)
+//     {
+//         // parent_of_leaf->children[num_entries] = (NODE)malloc(sizeof(struct node));
+//         NODE *n = (NODE *)malloc(sizeof(NODE) * parent_of_leaf->num_entries);
+//         for (int i = 0; i < parent_of_leaf->num_entries; i++)
+//         {
+//             n[i] = parent_of_leaf->children[i];
+//         }
+//         // handleOverflow(parent_of_leaf->children[parent_of_leaf->num_entries-1],R);
+//         NODE nn = handleOverflow(leaf, R);
+//         if (nn != NULL)
+//             adjustTree(nn->parent, nn);
+//         // correct this:
+//     }
+//     else
+//     {
+//         NODE new_parent = handleOverflow(n, R);
+//         tree->root = new_parent;
+//     }
+// }
 
 void adjustTree(NODE parent, NODE nn)
 {
-    // NODE sample_node = parent->children[0];
-
-    // while (parent != NULL)
-    // Root level
+    // Root level leaf
     if (parent == NULL)
         return;
 
-    // Split parent here
+    // Overflow
     if (parent->num_entries == M)
     {
         NODE pp = handleOverflowNonLeaf(parent, nn);
-        parent->lhv = 0;
-        for (int j = 0; j < parent->num_entries; j++)
-            parent->lhv = max(parent->lhv, parent->children[j]->lhv);
-        pp->lhv = 0;
-        for (int j = 0; j < pp->num_entries; j++)
-            pp->lhv = max(pp->lhv, pp->children[j]->lhv);
-        adjustTree(parent->parent, pp);
+
+        // If pp was created
+        if (pp)
+        {
+            parent->lhv = 0;
+            for (int j = 0; j < parent->num_entries; j++)
+                parent->lhv = max(parent->lhv, parent->children[j]->lhv);
+            pp->lhv = 0;
+            for (int j = 0; j < pp->num_entries; j++)
+                pp->lhv = max(pp->lhv, pp->children[j]->lhv);
+
+            if (parent->parent)
+                adjustTree(parent->parent, pp);
+        
+            // Initiate root split
+            else
+            {
+                NODE new_root = createNewNode(false);
+                if (pp->lhv < parent->lhv)
+                {
+                    new_root->children[0] = pp;
+                    new_root->children[1] = parent;
+                }
+                else
+                {
+                    new_root->children[0] = parent;
+                    new_root->children[1] = pp;
+                }
+                tree.root = new_root;
+                tree.height++;
+                tree.cnt++;
+            }
+        }
+
+        // Overflow handled without splittin
+        
     }
     // Else fit NN in the parent
     else
@@ -954,36 +1055,6 @@ void rect_expand(RECTANGLE rect, RECTANGLE rect2)
         rect->high.y = rect2->high.y;
 }
 
-// void printHilbertTree(NODE root, int depth) {
-//     if (root == NULL) {
-//         return;
-//     }
-//     // Print the current node
-//     for (int i = 0; i < depth; i++) {
-//         printf("  ");
-//     }
-//     printf("Node with %d entries:\n", root->num_entries);
-//     for (int i = 0; i < root->num_entries; i++) {
-//         for (int j = 0; j < depth; j++) {
-//             printf("  ");
-//         }
-//         printf("  Entry %d:\n", i);
-//         for (int j = 0; j < depth; j++) {
-//             printf("  ");
-//         }
-//         printf("    Rect: (%d, %d, %d, %d)\n", root->rects[i]->low.x, root->rects[i]->low.y, root->rects[i]->high.x, root->rects[i]->high.y);
-//         for (int j = 0; j < depth; j++) {
-//             printf("  ");
-//         }
-//         printf("    Element: %d %d\n", root->elements[i]->x,root->elements[i]->y);
-//     }
-
-//     // Recursively print the children nodes
-//     for (int i = 0; i < root->num_entries + 1; i++) {
-//         printHilbertTree(root->children[i], depth + 1);
-//     }
-// }
-
 void printHilbertTree(NODE root, int depth)
 {
     if (root == NULL)
@@ -1068,40 +1139,6 @@ void preOrderTraversal(NODE root)
     }
 }
 
-// int HRr_size(struct HRtree *tree) {
-//     return tree->size;
-// }
-
-// const char *HRtree_string(struct HRtree *tree) {
-//     return "(HRtree)";
-// }
-
-// struct node *newNode(int min, int max) {
-//     struct node *n = (struct node*)malloc(sizeof(struct node));
-//     n->min = min;
-//     n->max = max;
-//     n->parent = NULL;
-//     n->left = NULL;
-//     n->right = NULL;
-//     n->leaf = false;
-//     n->entries = newList(max);
-//     mpz_init(n->lhv);
-//     n->bb = NULL;
-//     return n;
-// }
-
-// const char *node_string(struct node *n) {
-//     char *str = (char*)malloc(sizeof(char)*100);
-//     snprintf(str, 100, "node{leaf: %d, entries: %p, lhv: %Zd}", n->leaf, n->entries, n->lhv);
-//     return str;
-// }
-
-// struct entry *node_get_entries(struct node *n, int *n_entries) {
-//     struct entry *entries = NULL;
-//     entries = entryList_get_entries(n->entries, n_entries);
-//     return entries;
-// }
-
 struct data
 {
     void *item;
@@ -1167,7 +1204,6 @@ void myPrint(char *hello, NODE hehe)
 
 int main(int argc, char const *argv[])
 {
-    rtree tree;
     tree.cnt = 0;
     tree.height = 1;
     tree.root = malloc(sizeof(node));
@@ -1181,14 +1217,13 @@ int main(int argc, char const *argv[])
 
     RECTANGLE r2 = (createNewRectangle(2, 20, 2, 20));
     insertRect(r2, tree.root, &tree);
-
+    RECTANGLE r3 = (createNewRectangle(2, 19, 2, 19));
+    insertRect(r3, tree.root, &tree);
     RECTANGLE r4 = (createNewRectangle(3, 20, 3, 20));
     insertRect(r4, tree.root, &tree);
 
     RECTANGLE r5 = (createNewRectangle(2, 10, 2, 10));
     insertRect(r5, tree.root, &tree);
-    RECTANGLE r3 = (createNewRectangle(2, 19, 2, 19));
-    insertRect(r3, tree.root, &tree);
     RECTANGLE r6 = (createNewRectangle(8, 5, 8, 5));
     insertRect(r6, tree.root, &tree);
     RECTANGLE r7 = createNewRectangle(4,5,4,5);
