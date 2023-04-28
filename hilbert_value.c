@@ -4,7 +4,7 @@
 
 
 // Assumes coordinates are 32-bit signed integers
-#define COORD_BITS 16                   // Number of bits used for each coordinate
+#define COORD_BITS 2                   // Number of bits used for each coordinate
 #define HILBERT_BITS (COORD_BITS * 2) // Total number of bits in Hilbert curve
 
 typedef struct rectangle rectangle;
@@ -57,14 +57,45 @@ uint32_t hilbert_value(uint32_t z)
     return h;
 }
 
+void rot(int n, int *x, int *y, int rx, int ry)
+{
+    if (ry == 0)
+    {
+        if (rx == 1)
+        {
+            *x = n - 1 - *x;
+            *y = n - 1 - *y;
+        }
+
+        // Swap x and y
+        int t = *x;
+        *x = *y;
+        *y = t;
+    }
+}
+
+int xy2d(int n, int x, int y)
+{
+    int rx, ry, s, d = 0;
+    for (s = n / 2; s > 0; s /= 2)
+    {
+        rx = (x & s) > 0;
+        ry = (y & s) > 0;
+        d += s * s * ((3 * rx) ^ ry);
+        rot(n, &x, &y, rx, ry);
+    }
+    return d;
+}
+
 uint32_t hilbert_rect_center(RECTANGLE r)
 {
     int32_t xmid = (r->low.x + r->high.x) / 2;
     int32_t ymid = (r->low.y + r->high.y) / 2;
-    uint32_t x = coord_to_binary(xmid);
-    uint32_t y = coord_to_binary(ymid);
-    uint32_t z = interleave_bits(x, y);
-    return hilbert_value(z);
+    // uint32_t x = coord_to_binary(xmid);
+    // uint32_t y = coord_to_binary(ymid);
+    // uint32_t z = interleave_bits(x, y);
+    // return hilbert_value(z);
+    return xy2d(16, xmid, ymid);
 }
 
 RECTANGLE createRectangle(int lowx, int lowy, int highx, int highy)
@@ -83,6 +114,6 @@ int main()
     //Create rectangle with coords (0,0) and (4,4) = 160
     //Create rectangle with coords (0,0) and (2,4) = 136
     //Create rectangle with coords (1,1) and (1,1) = 10
-    RECTANGLE rect = createRectangle(1, 1, 32, 32);
+    RECTANGLE rect = createRectangle(8, 15, 8, 15);
     printf("%d", rect->hilbertValue);
 }
