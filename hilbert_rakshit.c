@@ -508,25 +508,41 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             if (coop_sibling->lhv > n->lhv)
             {
                 NODE nn = createNewNode(n->isLeaf);
+                int lhv = INT_MIN;
 
                 //Initialize rects of nn to null
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
+
                 for (int i = 0; i < 3; i++)
                 {
                     n->rects[i] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 n->num_entries = 3;
+                n->lhv = lhv;
+
+                lhv = INT_MIN;
                 for (int i = 3; i < 6; i++)
                 {
                     coop_sibling->rects[i - 3] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 coop_sibling->num_entries = 3;
+                coop_sibling->lhv = lhv;
+
+                lhv = INT_MIN;
                 for (int i = 6; i < 9; i++)
                 {
                     nn->rects[i-6] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 nn->num_entries = 3;
+                nn->lhv = lhv;
+
                 return nn;
             }
             else
@@ -537,56 +553,95 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 for (int i = 0; i < M; i++)
                     nn->rects[i] = NULL;
 
+                int lhv = INT_MIN;
+
                 for (int i = 0; i < 3; i++)
                 {
                     coop_sibling->rects[i] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 coop_sibling->num_entries = 3;
+                coop_sibling->lhv = lhv;
+
+                lhv = INT_MIN;
                 for (int i = 3; i < 6; i++)
                 {
                     n->rects[i - 3] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 n->num_entries = 3;
+                n->lhv = lhv;
+
+                lhv = INT_MIN;
                 for (int i = 6; i < 9; i++)
                 {
                     nn->rects[i - 6] = rects[i];
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
                 }
                 nn->num_entries = 3;
+                nn->lhv = lhv;
+
+
                 return nn;
             }
         }
 
         // Rearrange entries
         else
-        {
+        {   
+            // Number of elements that go in the first and second node respectively
             int first_rearrange = n->num_entries + coop_sibling->num_entries / 2;
             int second_rearrange = n->num_entries + coop_sibling->num_entries - first_rearrange;
 
             // ONLY WORKS FOR LEAF NODES
             if (coop_sibling->lhv > n->lhv)
-            {
+            {   
+                int lhv = INT_MIN;
                 for (int i = 0; i < first_rearrange; i++)
+                {
                     n->rects[i] = rects[i];
-
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
+                }
                 n->num_entries = first_rearrange;
+                n->lhv = lhv;
 
+                lhv = INT_MIN;
                 for (int i = 0; i < second_rearrange; i++)
+                {
                     coop_sibling->rects[i] = rects[first_rearrange + i];
-                
+                    if (rects[first_rearrange + i]->hilbertValue > lhv)
+                        lhv = rects[first_rearrange + i]->hilbertValue;
+                } 
                 coop_sibling->num_entries = second_rearrange;
+                coop_sibling->lhv = lhv;
             }
 
             else
             {
+                int lhv = INT_MIN;
                 for (int i = 0; i < first_rearrange; i++)
+                {
                     coop_sibling->rects[i] = rects[i];
-
+                    if (rects[i]->hilbertValue > lhv)
+                        lhv = rects[i]->hilbertValue;
+                }
                 coop_sibling->num_entries = first_rearrange;
+                coop_sibling->lhv = lhv;
 
+                lhv = INT_MIN;
                 for (int i = 0; i < second_rearrange; i++)
+                {
                     n->rects[i] = rects[first_rearrange + i];
+                    if (rects[first_rearrange + i]->hilbertValue > lhv)
+                        lhv = rects[first_rearrange + i]->hilbertValue;
+                }
 
-                coop_sibling->num_entries = second_rearrange;
+                n->num_entries = second_rearrange;
+                n->lhv = lhv;
             }
 
 
