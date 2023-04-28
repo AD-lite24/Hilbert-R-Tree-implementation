@@ -442,7 +442,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             rects[i + 1] = rects[i];
             i--;
         }
-        rects[i] = r;
+        rects[i+1] = r;
 
         // If coop sibling is also full then split
         if (coop_sibling->num_entries == M)
@@ -1031,14 +1031,14 @@ int main(int argc, char const *argv[])
     insertRect(r7, tree.root, &tree);
     RECTANGLE r8 = createNewRectangle(3, 4, 3, 4);
     insertRect(r8, tree.root, &tree);
-    RECTANGLE r9 = createNewRectangle(3, 5, 3, 5);
-    insertRect(r9, tree.root, &tree);
-    RECTANGLE r10 = createNewRectangle(2,4,2,4);
-    insertRect(r10, tree.root, &tree);
-    RECTANGLE r11 = createNewRectangle(2,5,2,5);
-    insertRect(r11, tree.root, &tree);
-    RECTANGLE r12 = createNewRectangle(8,15,8,15);
-    insertRect(r12, tree.root, &tree);
+    // RECTANGLE r9 = createNewRectangle(3, 5, 3, 5);
+    // insertRect(r9, tree.root, &tree);
+    // RECTANGLE r10 = createNewRectangle(2,4,2,4);
+    // insertRect(r10, tree.root, &tree);
+    // RECTANGLE r11 = createNewRectangle(2,5,2,5);
+    // insertRect(r11, tree.root, &tree);
+    // RECTANGLE r12 = createNewRectangle(8,15,8,15);
+    // insertRect(r12, tree.root, &tree);
     printf("Number of nodes: %d\n", tree.cnt);
     printf("Tree height: %d\n", tree.height);
     myPrint("Root", tree.root);
