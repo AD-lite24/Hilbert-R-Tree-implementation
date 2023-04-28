@@ -374,7 +374,7 @@ NODE handleOverflow(NODE n, RECTANGLE r)
             rects[i + 1] = rects[i];
             i--;
         }
-        rects[i + 1] = r;
+        rects[i+1] = r;
 
         int lhv = INT_MIN;
         // put 3 in n and 2 in nn
@@ -1031,19 +1031,28 @@ int main(int argc, char const *argv[])
     insertRect(r7, tree.root, &tree);
     RECTANGLE r8 = createNewRectangle(3, 4, 3, 4);
     insertRect(r8, tree.root, &tree);
-    // RECTANGLE r9 = createNewRectangle(3, 5, 3, 5);
-    // insertRect(r9, tree.root, &tree);
-    // RECTANGLE r10 = createNewRectangle(2,4,2,4);
-    // insertRect(r10, tree.root, &tree);
-    // RECTANGLE r11 = createNewRectangle(2,5,2,5);
-    // insertRect(r11, tree.root, &tree);
-    // RECTANGLE r12 = createNewRectangle(8,15,8,15);
-    // insertRect(r12, tree.root, &tree);
-    printf("Number of nodes: %d\n", tree.cnt);
-    printf("Tree height: %d\n", tree.height);
-    myPrint("Root", tree.root);
-    myPrint("Child 1", tree.root->children[0]);
-    myPrint("Child 2", tree.root->children[1]);
+    RECTANGLE r9 = createNewRectangle(3, 5, 3, 5);
+    insertRect(r9, tree.root, &tree);
+    RECTANGLE r10 = createNewRectangle(2,4,2,4);
+    insertRect(r10, tree.root, &tree);
+    RECTANGLE r11 = createNewRectangle(2,5,2,5);
+    insertRect(r11, tree.root, &tree);
+    RECTANGLE r12 = createNewRectangle(8,15,8,15);
+    insertRect(r12, tree.root, &tree);
+    RECTANGLE r13 = createNewRectangle(8, 14, 8, 14);
+    insertRect(r13, tree.root, &tree);
+    RECTANGLE r14 = createNewRectangle(7, 15, 7, 15);
+    insertRect(r14, tree.root, &tree);
+    RECTANGLE r15 = createNewRectangle(9, 14, 9, 14);
+    insertRect(r15, tree.root, &tree);
+    RECTANGLE r16 = createNewRectangle(9, 15, 9, 15);
+    insertRect(r16, tree.root, &tree);
+
+    // printf("Number of nodes: %d\n", tree.cnt);
+    // printf("Tree height: %d\n", tree.height);
+    // myPrint("Root", tree.root);
+    // myPrint("Child 1", tree.root->children[0]);
+    // myPrint("Child 2", tree.root->children[1]);
     // myPrint("Child 3", tree.root->children[2]);
 
     return 0;
