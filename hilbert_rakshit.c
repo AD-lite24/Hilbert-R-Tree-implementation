@@ -504,6 +504,8 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                         lhv = rects[i]->hilbertValue;
                 }
                 coop_sibling->num_entries = 3;
+                coop_sibling->rects[3] = NULL;
+                coop_sibling->children[3] = NULL;
                 coop_sibling->lhv = lhv;
 
                 lhv = INT_MIN;
@@ -515,7 +517,8 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 }
                 n->num_entries = 3;
                 n->lhv = lhv;
-
+                n->rects[3] = NULL;
+                n->children[3] = NULL;
                 lhv = INT_MIN;
                 for (int i = 6; i < 9; i++)
                 {
@@ -525,6 +528,8 @@ NODE handleOverflow(NODE n, RECTANGLE r)
                 }
                 nn->num_entries = 3;
                 nn->lhv = lhv;
+                nn->rects[3] = NULL;
+                nn->children[3] = NULL;
 
                 return nn;
             }
@@ -1039,21 +1044,21 @@ int main(int argc, char const *argv[])
     insertRect(r11, tree.root, &tree);
     RECTANGLE r12 = createNewRectangle(8,15,8,15);
     insertRect(r12, tree.root, &tree);
-    RECTANGLE r13 = createNewRectangle(8, 14, 8, 14);
-    insertRect(r13, tree.root, &tree);
-    RECTANGLE r14 = createNewRectangle(7, 15, 7, 15);
-    insertRect(r14, tree.root, &tree);
-    RECTANGLE r15 = createNewRectangle(9, 14, 9, 14);
-    insertRect(r15, tree.root, &tree);
-    RECTANGLE r16 = createNewRectangle(9, 15, 9, 15);
-    insertRect(r16, tree.root, &tree);
+    // RECTANGLE r13 = createNewRectangle(8, 14, 8, 14);
+    // insertRect(r13, tree.root, &tree);
+    // RECTANGLE r14 = createNewRectangle(7, 15, 7, 15);
+    // insertRect(r14, tree.root, &tree);
+    // RECTANGLE r15 = createNewRectangle(9, 14, 9, 14);
+    // insertRect(r15, tree.root, &tree);
+    // RECTANGLE r16 = createNewRectangle(9, 15, 9, 15);
+    // insertRect(r16, tree.root, &tree);
 
-    // printf("Number of nodes: %d\n", tree.cnt);
-    // printf("Tree height: %d\n", tree.height);
-    // myPrint("Root", tree.root);
-    // myPrint("Child 1", tree.root->children[0]);
-    // myPrint("Child 2", tree.root->children[1]);
-    // myPrint("Child 3", tree.root->children[2]);
+    printf("Number of nodes: %d\n", tree.cnt);
+    printf("Tree height: %d\n", tree.height);
+    myPrint("Root", tree.root);
+    myPrint("Child 1", tree.root->children[0]);
+    myPrint("Child 2", tree.root->children[1]);
+    myPrint("Child 3", tree.root->children[2]);
 
     return 0;
 }
