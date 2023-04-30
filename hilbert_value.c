@@ -95,7 +95,7 @@ uint32_t hilbert_rect_center(RECTANGLE r)
     // uint32_t y = coord_to_binary(ymid);
     // uint32_t z = interleave_bits(x, y);
     // return hilbert_value(z);
-    return xy2d(16, xmid, ymid);
+    return xy2d(5, xmid, ymid);
 }
 
 RECTANGLE createRectangle(int lowx, int lowy, int highx, int highy)
@@ -114,6 +114,6 @@ int main()
     //Create rectangle with coords (0,0) and (4,4) = 160
     //Create rectangle with coords (0,0) and (2,4) = 136
     //Create rectangle with coords (1,1) and (1,1) = 10
-    RECTANGLE rect = createRectangle(8, 15, 8, 15);
+    RECTANGLE rect = createRectangle(8, 5, 8, 5);
     printf("%d", rect->hilbertValue);
 }
