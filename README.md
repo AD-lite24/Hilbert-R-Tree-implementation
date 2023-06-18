@@ -18,7 +18,9 @@ By combining the R-tree and the Hilbert curve, the Hilbert R-tree achieves both 
 
 To run the code, firstly, add a file named "input.txt" in which, all the sample data, of 2D points is stored, to the current Code directory. Then, run the command on command line :
 
+```
 gcc DSA_assignment_group_7.c -o a.exe && ./a.exe
+```
 
 If you have the data stored in a file with different name, add the file to the directory, and change file name in line 872 of the C code file as per your convenience.
 
