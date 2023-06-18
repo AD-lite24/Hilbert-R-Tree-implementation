@@ -29,7 +29,6 @@ On running this code, we see the PreOrder Taraversal of the tree, which is a fun
 Some Assumptions taken for this code :
 1. We have taken order of Hilbert curve to be 5 currently, which gives an accuracy of order 5 for hilbert values. To change value of this accuracy variable, change the value on line number 9.
 2. Seeing the node structure, if a node is a leaf, it will only contain Rectangles, and, the children array will not be accessed, and would be NULL. If the node is not a leaf, children array will contain addresses of the node's children nodes, and rects[i] will hold the Maximum Bounding Rectangle of the ith child of the node
-3. Since the method of calculating hilbert value was not given in any research paper, we have taken the method from an online source, the source being : https://en.wikipedia.org/wiki/Hilbert_curve
-4. We have implemented a 2-3 splitting as was given in the research paper, except when splitting at root node (where 1-2 splitting is done).
+3. We have implemented a 2-3 splitting as was given in the research paper, except when splitting at root node (where 1-2 splitting is done).
 
 
