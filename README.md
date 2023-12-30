@@ -6,6 +6,8 @@ The Hilbert curve, on the other hand, is a space-filling curve that maps multidi
 
 By combining the R-tree and the Hilbert curve, the Hilbert R-tree achieves both efficient spatial indexing and improved data locality. The index structure organizes the objects using the R-tree's hierarchical approach, while the Hilbert curve is used to order the entries within each node. This ordering helps to reduce the overlap of bounding boxes and improves the overall query performance.
 
+[Link to paper](https://www.vldb.org/conf/1994/P500.PDF)
+
 ### Usage
 
 To run the code, firstly, add a file named "input.txt" in which, all the sample data, of 2D points is stored, to the current Code directory. Then, run the command on command line :
